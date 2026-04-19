@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Scientific Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Calculator -->
+        <div class="calculator">
+            <div class="mode-toggle">
+                <button class="toggle-btn" id="modeToggle">Show Scientific</button>
+                <button class="toggle-btn theme-toggle" id="themeToggle">🌙 Dark</button>
+            </div>
+
+            <div class="display-section">
+                <div class="formula" id="formula">0</div>
+                <div class="result" id="result">0</div>
+            </div>
+
+            <div class="angle-mode" id="angleModeContainer" style="display: none;">
+                <button class="angle-btn active" data-mode="deg">DEG</button>
+                <button class="angle-btn" data-mode="rad">RAD</button>
+            </div>
+
+            <!-- Basic Operations -->
+            <div class="btn-container">
+                <button class="clear" id="clear">C</button>
+                <button class="delete" id="delete">⌫</button>
+                <button class="operator" data-op="/">÷</button>
+                <button class="operator" data-op="*">×</button>
+            </div>
+
+            <div class="btn-container">
+                <button data-num="7">7</button>
+                <button data-num="8">8</button>
+                <button data-num="9">9</button>
+                <button class="operator" data-op="-">−</button>
+            </div>
+
+            <div class="btn-container">
+                <button data-num="4">4</button>
+                <button data-num="5">5</button>
+                <button data-num="6">6</button>
+                <button class="operator" data-op="+">+</button>
+            </div>
+
+            <div class="btn-container">
+                <button data-num="1">1</button>
+                <button data-num="2">2</button>
+                <button data-num="3">3</button>
+                <button class="operator" data-op=".">.</button>
+            </div>
+
+            <div class="btn-container">
+                <button data-num="0" style="grid-column: span 2;">0</button>
+                <button class="operator" data-op="(" style="font-size: 14px;">(</button>
+                <button class="operator" data-op=")" style="font-size: 14px;">)</button>
+            </div>
+
+            <div class="btn-container" style="grid-template-columns: repeat(2, 1fr);">
+                <button class="equals" id="equals">=</button>
+                <button class="operator" data-op="^">^</button>
+            </div>
+
+            <!-- Advanced Operations -->
+            <div class="advanced-section" id="advancedSection">
+                <div class="btn-container full">
+                    <button class="operator" data-func="sin">sin</button>
+                    <button class="operator" data-func="cos">cos</button>
+                    <button class="operator" data-func="tan">tan</button>
+                    <button class="operator" data-func="sqrt">√</button>
+                    <button class="operator" data-func="pi">π</button>
+                </div>
+
+                <div class="btn-container full">
+                    <button class="operator" data-func="log">log</button>
+                    <button class="operator" data-func="ln">ln</button>
+                    <button class="operator" data-func="exp">e^x</button>
+                    <button class="operator" data-func="fact">n!</button>
+                    <button class="operator" data-op="e">e</button>
+                </div>
+
+                <div class="memory-controls">
+                    <button class="memory-btn" id="memAdd">M+</button>
+                    <button class="memory-btn" id="memSub">M-</button>
+                    <button class="memory-btn" id="memRecall">MR</button>
+                    <button class="memory-btn" id="memClear">MC</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History -->
+        <div class="history-section">
+            <h3>
+                Calculation History
+                <span id="memDisplay" style="font-size: 12px; color: #667eea; display: none;">M: <span id="memValue">0</span></span>
+            </h3>
+            <div class="history-list" id="historyList">
+                <div class="empty-history">No calculations yet</div>
+            </div>
+            <button class="clear-history" id="clearHistory">Clear History</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
