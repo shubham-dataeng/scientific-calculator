@@ -96,22 +96,29 @@ C          Clear all
 ## 📁 Project Structure
 
 ```
-scientific-calculator/
-├── index.html                    # Main HTML5 shell
-├── script.js                     # Calculator engine (1,302 lines)
-├── style.css                     # Responsive styling (1,388 lines)
-├── manifest.json                 # PWA metadata
-├── service-worker.js             # Offline support
-├── performance-monitor.js        # Performance tracking
-├── calc-worker.js                # Web Worker (optional)
-├── .htaccess                     # Server caching/security
+scientific-calculator/           # Root - Application Files
+├── index.html                   # Main app shell (entry point)
+├── script.js                    # Calculator engine (1,302 lines)
+├── style.css                    # Responsive styling (1,388 lines)
+├── manifest.json                # PWA metadata
+├── service-worker.js            # Offline support
+├── performance-monitor.js       # Performance tracking
+├── calc-worker.js               # Web Worker (optional)
+├── .htaccess                    # Server config (caching/security)
+├── README.md                    # Project overview (this file)
 │
-├── README.md                     # This file
-├── DEPLOYMENT_GUIDE.md           # How to deploy
-├── PERFORMANCE_GUIDE.md          # Performance optimizations
-├── TESTING_GUIDE.md              # Testing instructions
-├── QA_FINAL_REPORT.md            # Quality metrics
-└── BUG_REPORT.md                 # Bug documentation
+├── docs/                        # 📚 Documentation Folder
+│   ├── README.md                # Documentation index
+│   ├── DEPLOYMENT_GUIDE.md      # How to deploy & monitor
+│   ├── PERFORMANCE_GUIDE.md     # Performance optimizations
+│   ├── TESTING_GUIDE.md         # Testing instructions
+│   ├── QA_FINAL_REPORT.md       # Quality metrics
+│   └── BUG_REPORT.md            # Bug documentation & fixes
+│
+└── tests/                       # 🧪 Testing Folder
+    ├── README.md                # Testing guide
+    ├── test-runner.html         # Test UI (run tests visually)
+    └── calculator-test-suite.js # Test framework (2,500+ cases)
 ```
 
 ---
@@ -143,7 +150,7 @@ git push origin main
 # ✅ Live immediately!
 ```
 
-See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for full details.
+See [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) for full details.
 
 ---
 
@@ -152,7 +159,7 @@ See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for full details.
 ### Run Test Suite
 ```bash
 # Option 1: Open in browser
-# Open: test-runner.html
+# Open: tests/test-runner.html
 
 # Option 2: Console
 # F12 → Console → Run test suite manually
@@ -169,7 +176,7 @@ ts.runAllTests();
 
 **Result:** 98%+ pass rate, 2,500+ total tests
 
-See [TESTING_GUIDE.md](TESTING_GUIDE.md) for details.
+See [tests/README.md](tests/README.md) and [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md) for details.
 
 ---
 
@@ -198,7 +205,7 @@ Bundle Size:            95 KB gzip (73% reduction)
 1. Click "📊 Perf" button (bottom right)
 2. Or press F12 → Console → `perfMonitor.showPerformanceDashboard()`
 
-See [PERFORMANCE_GUIDE.md](PERFORMANCE_GUIDE.md) for details.
+See [docs/PERFORMANCE_GUIDE.md](docs/PERFORMANCE_GUIDE.md) for details.
 
 ---
 
@@ -218,7 +225,7 @@ See [PERFORMANCE_GUIDE.md](PERFORMANCE_GUIDE.md) for details.
 ⚠️ 0^0 returns 1 (JavaScript standard)
 ⚠️ Very large numbers (precision limits)
 
-See [BUG_REPORT.md](BUG_REPORT.md) for full list.
+See [docs/BUG_REPORT.md](docs/BUG_REPORT.md) for full list.
 
 ---
 
@@ -251,11 +258,13 @@ See [BUG_REPORT.md](BUG_REPORT.md) for full list.
 | Document | Purpose |
 |----------|---------|
 | [README.md](README.md) | Project overview (you are here) |
-| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | How to deploy & monitor |
-| [PERFORMANCE_GUIDE.md](PERFORMANCE_GUIDE.md) | Performance optimizations |
-| [TESTING_GUIDE.md](TESTING_GUIDE.md) | How to run tests |
-| [QA_FINAL_REPORT.md](QA_FINAL_REPORT.md) | Quality metrics & findings |
-| [BUG_REPORT.md](BUG_REPORT.md) | Bug documentation & fixes |
+| [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) | How to deploy & monitor |
+| [docs/PERFORMANCE_GUIDE.md](docs/PERFORMANCE_GUIDE.md) | Performance optimizations |
+| [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md) | How to run tests |
+| [docs/QA_FINAL_REPORT.md](docs/QA_FINAL_REPORT.md) | Quality metrics & findings |
+| [docs/BUG_REPORT.md](docs/BUG_REPORT.md) | Bug documentation & fixes |
+| [tests/README.md](tests/README.md) | Testing guide |
+| [docs/README.md](docs/README.md) | Documentation index |
 
 ---
 
