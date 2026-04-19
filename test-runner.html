@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator - QA Test Runner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            max-height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .log-entry {
+            margin-bottom: 10px;
+        }
+        
+        .error {
+            color: #ff4444;
+        }
+        
+        .success {
+            color: #44ff44;
+        }
+        
+        .warning {
+            color: #ffaa00;
+        }
+        
+        .info {
+            color: #44aaff;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .running {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Scientific Calculator QA Test Suite</h1>
+            <p>Comprehensive Automated Testing System</p>
+        </div>
+        
+        <div class="content">
+            <div class="button-group">
+                <button class="btn-primary" onclick="runTests()">▶️ Run All Tests</button>
+                <button class="btn-secondary" onclick="clearOutput()">🗑️ Clear Output</button>
+                <button class="btn-secondary" onclick="downloadResults()">💾 Download Results</button>
+            </div>
+            
+            <div id="running" class="running" style="display: none;">
+                <div class="spinner"></div>
+                <span>Running tests... This may take 30-60 seconds</span>
+            </div>
+            
+            <div id="stats" class="stats"></div>
+            
+            <h2 style="margin-top: 30px; margin-bottom: 15px;">📋 Test Output:</h2>
+            <div id="output" class="output">Ready to run tests...</div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    <script src="calculator-test-suite.js"></script>
+    
+    <script>
+        const outputDiv = document.getElementById('output');
+        const statsDiv = document.getElementById('stats');
+        const runningDiv = document.getElementById('running');
+        
+        // Override console.log for output display
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args.map(arg => {
+                if (typeof arg === 'object') return JSON.stringify(arg, null, 2);
+                return String(arg);
+            }).join(' ');
+            addLog(message);
+        };
+        
+        function addLog(message) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = message;
+            outputDiv.appendChild(entry);
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+        
+        function clearOutput() {
+            outputDiv.innerHTML = 'Cleared. Click "Run All Tests" to start.\n';
+            statsDiv.innerHTML = '';
+        }
+        
+        async function runTests() {
+            clearOutput();
+            runningDiv.style.display = 'flex';
+            
+            // Load calculator from the main page
+            try {
+                // Try to access calculator from parent window or create mock
+                if (typeof calc === 'undefined') {
+                    console.error('❌ Calculator not found. Please run tests from the calculator page.');
+                    runningDiv.style.display = 'none';
+                    return;
+                }
+                
+                const testSuite = new CalculatorTestSuite();
+                await new Promise(resolve => {
+                    testSuite.runAllTests();
+                    resolve();
+                });
+                
+                // Display stats
+                displayStats(window.testResults);
+                
+            } catch (error) {
+                console.error('❌ Error running tests:', error.message);
+            }
+            
+            runningDiv.style.display = 'none';
+        }
+        
+        function displayStats(results) {
+            if (!results) return;
+            
+            statsDiv.innerHTML = `
+                <div class="stat-card">
+                    <h3>Total Tests</h3>
+                    <div class="value">${results.total}</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #44aa44;">
+                    <h3>Passed</h3>
+                    <div class="value" style="color: #44aa44;">${results.passed}</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #ff4444;">
+                    <h3>Failed</h3>
+                    <div class="value" style="color: #ff4444;">${results.failed}</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #ffaa00;">
+                    <h3>Pass Rate</h3>
+                    <div class="value" style="color: #ffaa00;">${results.passRate}</div>
+                </div>
+            `;
+        }
+        
+        function downloadResults() {
+            if (!window.testResults) {
+                alert('No test results to download. Run tests first!');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(window.testResults, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `calculator-test-results-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+    </script>
+</body>
+</html>

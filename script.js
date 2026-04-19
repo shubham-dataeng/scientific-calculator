@@ -282,6 +282,13 @@ class Calculator {
         try {
             let expr = this.formula;
             
+            // INPUT VALIDATION - Fix #7
+            if (!expr || expr.trim() === '' || expr === '0') {
+                this.result = '0';
+                this.updateDisplay();
+                return;
+            }
+            
             // Replace display symbols with math.js compatible versions
             expr = expr.replace(/π/g, 'pi');
             expr = expr.replace(/\^/g, '**');
@@ -299,29 +306,55 @@ class Calculator {
                 expr = expr.replace(/atan\(([^)]+)\)/g, '180/pi*atan($1)');
             }
             
-            // Replace e with Math.E for math.js
-            expr = expr.replace(/\be\b/g, 'e');
+            // Better e replacement - Fix #6 (only replace standalone 'e')
+            expr = expr.replace(/\be(?=[+\-*/\)\(^]|$)/g, '(2.718281828459045)');
             
             // Handle percentage
             expr = expr.replace(/(\d+)%/g, '($1/100)');
             
             // Use math.js to evaluate safely
-            const result = math.evaluate(expr);
+            let result = math.evaluate(expr);
             
-            // Apply precision
+            // HANDLE SPECIAL VALUES - Fix #1, #2, #3, #4
+            if (!isFinite(result)) {
+                if (isNaN(result)) {
+                    this.result = 'Error: Invalid operation';
+                } else if (result === Infinity) {
+                    this.result = 'Infinity';
+                } else {
+                    this.result = '-Infinity';
+                }
+                this.updateDisplay();
+                return;
+            }
+            
+            // CHECK RANGE - Fix #5 (Large numbers)
+            if (Math.abs(result) > Number.MAX_SAFE_INTEGER) {
+                console.warn('Result exceeds safe integer range');
+            }
+            
+            // IMPROVED PRECISION ROUNDING - Fix #2 (Floating point precision)
+            const highPrecisionFactor = Math.pow(10, Math.max(this.precision + 2, 15));
+            const highPrecisionRounded = Math.round(result * highPrecisionFactor) / highPrecisionFactor;
+            
+            // Apply final precision
             const multiplier = Math.pow(10, this.precision);
-            this.result = (Math.round(result * multiplier) / multiplier).toString();
+            this.result = (Math.round(highPrecisionRounded * multiplier) / multiplier).toString();
             
             this.addToHistory(this.formula, this.result);
             this.formula = this.result;
             this.updateDisplay();
         } catch (e) {
-            // Better error messages
+            // IMPROVED ERROR MESSAGES - Fix #8
             const errorMsg = e.message.toLowerCase();
             if (errorMsg.includes('divide')) {
-                this.result = 'Division by zero';
+                this.result = 'Cannot divide by zero';
             } else if (errorMsg.includes('parenthes')) {
                 this.result = 'Unmatched parentheses';
+            } else if (errorMsg.includes('0^0')) {
+                this.result = 'Error: 0^0 undefined';
+            } else if (errorMsg.includes('negative')) {
+                this.result = 'Error: Invalid for negative';
             } else if (errorMsg.includes('syntax')) {
                 this.result = 'Syntax error';
             } else {
