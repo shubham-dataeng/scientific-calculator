@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <meta name="description" content="Advanced Scientific Calculator with Unit Converter, Programmer Mode, Statistics, and more">
     <title>Advanced Scientific Calculator</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dy='.3em'>🧮</text></svg>">
 </head>
 <body>
     <div class="container">
@@ -17,6 +21,8 @@
                 <button class="toggle-btn" id="notationToggle" title="Scientific Notation">Notation</button>
                 <button class="toggle-btn" id="converterToggle" title="Unit Converter">🔄 Converter</button>
                 <button class="toggle-btn" id="programmerToggle" title="Programmer Mode">💻 Prog</button>
+                <button class="toggle-btn" id="statsToggle" title="Statistics">📊 Stats</button>
+                <button class="toggle-btn" id="constantsToggle" title="Constants Library">⚗️ Const</button>
                 <button class="toggle-btn" id="settingsBtn" title="Settings">⚙️</button>
                 <select id="precisionSelect" class="precision-select" title="Decimal Places">
                     <option value="2">2 decimals</option>
@@ -210,6 +216,74 @@
         </div>
     </div>
 
+    <!-- Statistics Calculator -->
+    <div id="statsSection" class="stats-section" style="display: none;">
+        <h3>📊 Statistics Calculator</h3>
+        
+        <div class="stats-input-group">
+            <input type="number" id="statsInput" class="stats-number-input" placeholder="Enter a number">
+            <button class="stats-add-btn" id="statsAddBtn">Add</button>
+            <button class="stats-clear-btn" id="statsClearBtn">Clear All</button>
+        </div>
+
+        <div class="stats-list-container">
+            <h4>Numbers:</h4>
+            <div class="stats-list" id="statsList">No numbers yet</div>
+        </div>
+
+        <div class="stats-results">
+            <h4>Results:</h4>
+            <div class="stats-result-item">
+                <label>Count:</label>
+                <span id="statsCount">0</span>
+            </div>
+            <div class="stats-result-item">
+                <label>Sum:</label>
+                <span id="statsSum">0</span>
+            </div>
+            <div class="stats-result-item">
+                <label>Mean (Average):</label>
+                <span id="statsMean">0</span>
+            </div>
+            <div class="stats-result-item">
+                <label>Median:</label>
+                <span id="statsMedian">0</span>
+            </div>
+            <div class="stats-result-item">
+                <label>Mode:</label>
+                <span id="statsMode">N/A</span>
+            </div>
+            <div class="stats-result-item">
+                <label>Variance:</label>
+                <span id="statsVariance">0</span>
+            </div>
+            <div class="stats-result-item">
+                <label>Std Dev:</label>
+                <span id="statsStdDev">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Constants Library -->
+    <div id="constantsSection" class="constants-section" style="display: none;">
+        <h3>⚗️ Constants Library</h3>
+        
+        <div class="constants-category">
+            <h4>Physics</h4>
+            <div class="constants-grid" id="physicsConstants"></div>
+        </div>
+
+        <div class="constants-category">
+            <h4>Mathematics</h4>
+            <div class="constants-grid" id="mathConstants"></div>
+        </div>
+
+        <div class="constants-category">
+            <h4>Chemistry</h4>
+            <div class="constants-grid" id="chemistryConstants"></div>
+        </div>
+    </div>
+
     <!-- Help Modal -->
     <div id="helpModal" class="modal">
         <div class="modal-content">
@@ -295,5 +369,13 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
     <script src="script.js"></script>
+    <script>
+        // Register service worker for PWA support
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed'));
+        }
+    </script>
 </body>
 </html>

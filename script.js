@@ -709,9 +709,185 @@ class ProgrammerMode {
     }
 }
 
+class Statistics {
+    constructor() {
+        this.numbers = [];
+        this.initElements();
+        this.attachListeners();
+    }
+
+    initElements() {
+        this.input = document.getElementById('statsInput');
+        this.addBtn = document.getElementById('statsAddBtn');
+        this.clearBtn = document.getElementById('statsClearBtn');
+        this.list = document.getElementById('statsList');
+        this.countDisplay = document.getElementById('statsCount');
+        this.sumDisplay = document.getElementById('statsSum');
+        this.meanDisplay = document.getElementById('statsMean');
+        this.medianDisplay = document.getElementById('statsMedian');
+        this.modeDisplay = document.getElementById('statsMode');
+        this.varianceDisplay = document.getElementById('statsVariance');
+        this.stdDevDisplay = document.getElementById('statsStdDev');
+    }
+
+    attachListeners() {
+        this.addBtn.addEventListener('click', () => this.addNumber());
+        this.clearBtn.addEventListener('click', () => this.clearAll());
+        this.input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.addNumber();
+        });
+    }
+
+    addNumber() {
+        const value = parseFloat(this.input.value);
+        if (isNaN(value)) {
+            alert('Please enter a valid number');
+            return;
+        }
+        this.numbers.push(value);
+        this.input.value = '';
+        this.input.focus();
+        this.updateDisplay();
+    }
+
+    clearAll() {
+        this.numbers = [];
+        this.updateDisplay();
+    }
+
+    updateDisplay() {
+        // Display numbers
+        if (this.numbers.length === 0) {
+            this.list.innerHTML = 'No numbers yet';
+        } else {
+            this.list.innerHTML = this.numbers.map((num, idx) => `
+                <div class="stats-item">
+                    ${num}
+                    <button onclick="stats.numbers.splice(${idx}, 1); stats.updateDisplay();">×</button>
+                </div>
+            `).join('');
+        }
+
+        // Calculate and display statistics
+        this.countDisplay.textContent = this.numbers.length;
+        this.sumDisplay.textContent = this.numbers.length > 0 ? this.sum().toFixed(4) : '0';
+        this.meanDisplay.textContent = this.numbers.length > 0 ? this.mean().toFixed(4) : '0';
+        this.medianDisplay.textContent = this.numbers.length > 0 ? this.median().toFixed(4) : '0';
+        this.modeDisplay.textContent = this.numbers.length > 0 ? this.mode() : 'N/A';
+        this.varianceDisplay.textContent = this.numbers.length > 0 ? this.variance().toFixed(4) : '0';
+        this.stdDevDisplay.textContent = this.numbers.length > 0 ? this.standardDeviation().toFixed(4) : '0';
+    }
+
+    sum() {
+        return this.numbers.reduce((a, b) => a + b, 0);
+    }
+
+    mean() {
+        return this.numbers.length > 0 ? this.sum() / this.numbers.length : 0;
+    }
+
+    median() {
+        const sorted = [...this.numbers].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    }
+
+    mode() {
+        if (this.numbers.length === 0) return 'N/A';
+        const frequency = {};
+        this.numbers.forEach(num => {
+            frequency[num] = (frequency[num] || 0) + 1;
+        });
+        const maxFreq = Math.max(...Object.values(frequency));
+        if (maxFreq === 1) return 'No mode';
+        const modes = Object.keys(frequency).filter(key => frequency[key] === maxFreq);
+        return modes.length === this.numbers.length ? 'No mode' : modes.map(m => parseFloat(m).toFixed(2)).join(', ');
+    }
+
+    variance() {
+        if (this.numbers.length === 0) return 0;
+        const mean = this.mean();
+        const squaredDiffs = this.numbers.map(num => Math.pow(num - mean, 2));
+        return squaredDiffs.reduce((a, b) => a + b, 0) / this.numbers.length;
+    }
+
+    standardDeviation() {
+        return Math.sqrt(this.variance());
+    }
+}
+
+class ConstantsLibrary {
+    constructor() {
+        this.constants = {
+            physics: [
+                { name: 'Gravitational Constant', symbol: 'G', value: '6.67430e-11 m³·kg⁻¹·s⁻²' },
+                { name: 'Speed of Light', symbol: 'c', value: '299792458 m/s' },
+                { name: 'Planck Constant', symbol: 'h', value: '6.62607015e-34 J·s' },
+                { name: 'Boltzmann Constant', symbol: 'k_B', value: '1.380649e-23 J/K' },
+                { name: 'Elementary Charge', symbol: 'e', value: '1.602176634e-19 C' },
+                { name: 'Avogadro Number', symbol: 'N_A', value: '6.02214076e23 mol⁻¹' },
+            ],
+            math: [
+                { name: 'Pi', symbol: 'π', value: '3.14159265359' },
+                { name: 'Euler Number', symbol: 'e', value: '2.71828182846' },
+                { name: 'Golden Ratio', symbol: 'φ', value: '1.61803398875' },
+                { name: 'Square Root of 2', symbol: '√2', value: '1.41421356237' },
+                { name: 'Imaginary Unit', symbol: 'i', value: '√(-1)' },
+            ],
+            chemistry: [
+                { name: 'Avogadro Number', symbol: 'N_A', value: '6.022e23' },
+                { name: 'Faraday Constant', symbol: 'F', value: '96485.3 C/mol' },
+                { name: 'Gas Constant', symbol: 'R', value: '8.314 J/(mol·K)' },
+                { name: 'Molar Volume (STP)', symbol: 'V_m', value: '22.71 L/mol' },
+                { name: 'Atomic Mass Unit', symbol: 'u', value: '1.66054e-27 kg' },
+            ]
+        };
+        this.initElements();
+        this.attachListeners();
+        this.renderConstants();
+    }
+
+    initElements() {
+        this.physicsContainer = document.getElementById('physicsConstants');
+        this.mathContainer = document.getElementById('mathConstants');
+        this.chemistryContainer = document.getElementById('chemistryConstants');
+    }
+
+    attachListeners() {
+        // Listeners will be attached when constants are rendered
+    }
+
+    renderConstants() {
+        this.physicsContainer.innerHTML = this.constants.physics.map(c => this.createConstantHTML(c)).join('');
+        this.mathContainer.innerHTML = this.constants.math.map(c => this.createConstantHTML(c)).join('');
+        this.chemistryContainer.innerHTML = this.constants.chemistry.map(c => this.createConstantHTML(c)).join('');
+
+        // Attach click listeners
+        document.querySelectorAll('.constant-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const symbol = e.currentTarget.querySelector('.constant-symbol').textContent.trim();
+                calc.formula += symbol;
+                calc.updateDisplay();
+            });
+        });
+    }
+
+    createConstantHTML(constant) {
+        return `
+            <div class="constant-item">
+                <div class="constant-name">${constant.name}</div>
+                <div class="constant-symbol">${constant.symbol}</div>
+                <div class="constant-value">${constant.value}</div>
+            </div>
+        `;
+    }
+}
+
 const calc = new Calculator();
 const converter = new UnitConverter();
 const programmer = new ProgrammerMode();
+const stats = new Statistics();
+const constants = new ConstantsLibrary();
 
 // Toggle between calculator, converter, and programmer mode
 document.getElementById('converterToggle').addEventListener('click', () => {
@@ -719,6 +895,8 @@ document.getElementById('converterToggle').addEventListener('click', () => {
     const historySection = document.querySelector('.history-section');
     const converterSection = document.getElementById('converterSection');
     const programmerSection = document.getElementById('programmerSection');
+    const statsSection = document.getElementById('statsSection');
+    const constantsSection = document.getElementById('constantsSection');
     
     const isConverterShown = converterSection.style.display !== 'none';
     
@@ -726,6 +904,8 @@ document.getElementById('converterToggle').addEventListener('click', () => {
     historySection.style.display = isConverterShown ? 'block' : 'none';
     converterSection.style.display = isConverterShown ? 'none' : 'block';
     programmerSection.style.display = 'none';
+    statsSection.style.display = 'none';
+    constantsSection.style.display = 'none';
 });
 
 document.getElementById('programmerToggle').addEventListener('click', () => {
@@ -733,6 +913,8 @@ document.getElementById('programmerToggle').addEventListener('click', () => {
     const historySection = document.querySelector('.history-section');
     const converterSection = document.getElementById('converterSection');
     const programmerSection = document.getElementById('programmerSection');
+    const statsSection = document.getElementById('statsSection');
+    const constantsSection = document.getElementById('constantsSection');
     
     const isProgrammerShown = programmerSection.style.display !== 'none';
     
@@ -740,4 +922,42 @@ document.getElementById('programmerToggle').addEventListener('click', () => {
     historySection.style.display = isProgrammerShown ? 'block' : 'none';
     converterSection.style.display = 'none';
     programmerSection.style.display = isProgrammerShown ? 'none' : 'block';
+    statsSection.style.display = 'none';
+    constantsSection.style.display = 'none';
+});
+
+document.getElementById('statsToggle').addEventListener('click', () => {
+    const calcSection = document.querySelector('.calculator');
+    const historySection = document.querySelector('.history-section');
+    const converterSection = document.getElementById('converterSection');
+    const programmerSection = document.getElementById('programmerSection');
+    const statsSection = document.getElementById('statsSection');
+    const constantsSection = document.getElementById('constantsSection');
+    
+    const isStatsShown = statsSection.style.display !== 'none';
+    
+    calcSection.style.display = isStatsShown ? 'block' : 'none';
+    historySection.style.display = isStatsShown ? 'block' : 'none';
+    converterSection.style.display = 'none';
+    programmerSection.style.display = 'none';
+    statsSection.style.display = isStatsShown ? 'none' : 'block';
+    constantsSection.style.display = 'none';
+});
+
+document.getElementById('constantsToggle').addEventListener('click', () => {
+    const calcSection = document.querySelector('.calculator');
+    const historySection = document.querySelector('.history-section');
+    const converterSection = document.getElementById('converterSection');
+    const programmerSection = document.getElementById('programmerSection');
+    const statsSection = document.getElementById('statsSection');
+    const constantsSection = document.getElementById('constantsSection');
+    
+    const isConstantsShown = constantsSection.style.display !== 'none';
+    
+    calcSection.style.display = isConstantsShown ? 'block' : 'none';
+    historySection.style.display = isConstantsShown ? 'block' : 'none';
+    converterSection.style.display = 'none';
+    programmerSection.style.display = 'none';
+    statsSection.style.display = 'none';
+    constantsSection.style.display = isConstantsShown ? 'none' : 'block';
 });
