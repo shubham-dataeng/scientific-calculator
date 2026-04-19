@@ -5,13 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#667eea">
     <meta name="description" content="Advanced Scientific Calculator with Unit Converter, Programmer Mode, Statistics, and more">
+    
+    <!-- PERFORMANCE OPTIMIZATION - Cache Control -->
+    <meta http-equiv="Cache-Control" content="public, max-age=31536000, immutable">
+    
     <title>Advanced Scientific Calculator</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <!-- CRITICAL CSS - Inline for faster initial render -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; width: 100%; }
+        .spinner { 
+            width: 50px; height: 50px; 
+            border: 4px solid #fff; border-top-color: #667eea;
+            border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+    
+    <!-- NON-CRITICAL CSS - Deferred loading -->
+    <link rel="stylesheet" href="style.css" media="print" onload="this.media='all'">
+    
+    <!-- CRITICAL RESOURCES -->
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dy='.3em'>🧮</text></svg>">
+    
+    <!-- PRELOAD CRITICAL RESOURCES -->
+    <link rel="preload" as="script" href="script.js">
+    
+    <!-- PREFETCH OPTIONAL RESOURCES -->
+    <link rel="prefetch" href="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 </head>
 <body>
-    <div class="container">
+    <!-- LOADING INDICATOR -->
+    <noscript>
+        <p style="color: white; text-align: center; font-size: 18px; padding: 20px;">
+            JavaScript is required to use this calculator. Please enable it in your browser settings.
+        </p>
+    </noscript>
+    
+    <div class="container" id="app-container">
         <!-- Calculator -->
         <div class="calculator">
             <div class="mode-toggle">
@@ -397,14 +440,62 @@
         <button class="setting-btn reset-btn" id="resetSettings">Reset to Defaults</button>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
-    <script src="script.js"></script>
+    <!-- MAIN SCRIPT - Async for non-blocking -->
+    <script async src="script.js"></script>
+    
+    <!-- PERFORMANCE MONITORING -->
+    <script defer src="performance-monitor.js"></script>
+    
+    <!-- LAZY LOAD MATHJS - Deferred, not critical for initial render -->
     <script>
-        // Register service worker for PWA support
+        // Lazy load math.js on first calculation
+        let mathLoaded = false;
+        let mathLoadQueue = [];
+        
+        function loadMathJS() {
+            if (mathLoaded) return;
+            mathLoaded = true;
+            
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js';
+            script.async = false;
+            script.onload = () => {
+                console.log('✅ math.js loaded');
+                // Process any queued calculations
+                mathLoadQueue.forEach(fn => fn());
+                mathLoadQueue = [];
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Intercept calculator's calculate method
+        window.addEventListener('load', () => {
+            if (typeof calc !== 'undefined') {
+                const originalCalculate = calc.calculate.bind(calc);
+                calc.calculate = function() {
+                    if (!mathLoaded) {
+                        loadMathJS();
+                        mathLoadQueue.push(() => originalCalculate());
+                    } else {
+                        originalCalculate();
+                    }
+                };
+            }
+        });
+    </script>
+    
+    <!-- SERVICE WORKER REGISTRATION -->
+    <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js')
-                .then(reg => console.log('Service Worker registered'))
-                .catch(err => console.log('Service Worker registration failed'));
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => {
+                        console.log('✅ Service Worker registered');
+                        // Check for updates periodically
+                        setInterval(() => reg.update(), 60000);
+                    })
+                    .catch(err => console.log('⚠️ Service Worker failed:', err.message));
+            });
         }
     </script>
 </body>
