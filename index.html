@@ -23,6 +23,7 @@
                 <button class="toggle-btn" id="programmerToggle" title="Programmer Mode">💻 Prog</button>
                 <button class="toggle-btn" id="statsToggle" title="Statistics">📊 Stats</button>
                 <button class="toggle-btn" id="constantsToggle" title="Constants Library">⚗️ Const</button>
+                <button class="toggle-btn" id="solverToggle" title="Equation Solver">🔢 Solver</button>
                 <button class="toggle-btn" id="settingsBtn" title="Settings">⚙️</button>
                 <select id="precisionSelect" class="precision-select" title="Decimal Places">
                     <option value="2">2 decimals</option>
@@ -281,6 +282,35 @@
         <div class="constants-category">
             <h4>Chemistry</h4>
             <div class="constants-grid" id="chemistryConstants"></div>
+        </div>
+    </div>
+
+    <!-- Equation Solver -->
+    <div id="solverSection" class="solver-section" style="display: none;">
+        <h3>🔢 Equation Solver</h3>
+        
+        <div class="solver-input-group">
+            <label for="equationInput">Enter equation (e.g., 2x + 5 = 13):</label>
+            <input type="text" id="equationInput" class="solver-equation-input" placeholder="2x + 5 = 13">
+            <button class="solver-btn" id="solveBtn">Solve</button>
+        </div>
+
+        <div class="solver-results" id="solverResults" style="display: none;">
+            <h4>Solution:</h4>
+            <div class="solver-solution" id="solverSolution"></div>
+            <div class="solver-steps" id="solverSteps"></div>
+        </div>
+
+        <div class="solver-error" id="solverError" style="display: none;"></div>
+
+        <div class="solver-info">
+            <h4>Supported Formats:</h4>
+            <ul>
+                <li><strong>Linear:</strong> 2x + 5 = 13 or ax + b = 0</li>
+                <li><strong>Quadratic:</strong> x² + 3x + 2 = 0 or x^2 + 3x + 2 = 0</li>
+                <li><strong>Use x or X as variable</strong></li>
+                <li><strong>Use ^ for power (x^2, x^3, etc.)</strong></li>
+            </ul>
         </div>
     </div>
 

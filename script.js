@@ -816,6 +816,292 @@ class Statistics {
     }
 }
 
+class EquationSolver {
+    constructor() {
+        this.initElements();
+        this.attachListeners();
+    }
+
+    initElements() {
+        this.input = document.getElementById('equationInput');
+        this.solveBtn = document.getElementById('solveBtn');
+        this.resultsDiv = document.getElementById('solverResults');
+        this.solutionDiv = document.getElementById('solverSolution');
+        this.stepsDiv = document.getElementById('solverSteps');
+        this.errorDiv = document.getElementById('solverError');
+    }
+
+    attachListeners() {
+        this.solveBtn.addEventListener('click', () => this.solveEquation());
+        this.input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.solveEquation();
+        });
+    }
+
+    solveEquation() {
+        const equation = this.input.value.trim();
+        
+        // Clear previous results
+        this.resultsDiv.style.display = 'none';
+        this.errorDiv.style.display = 'none';
+        this.errorDiv.textContent = '';
+        
+        if (!equation) {
+            this.showError('Please enter an equation');
+            return;
+        }
+
+        try {
+            // Parse equation: convert x² to x^2, normalize
+            const normalizedEquation = equation.replace(/x²|x\^2/gi, 'x^2')
+                                             .replace(/x³|x\^3/gi, 'x^3')
+                                             .replace(/\s+/g, '')
+                                             .toUpperCase();
+            
+            // Check if equation has "=" sign
+            if (!normalizedEquation.includes('=')) {
+                this.showError('Equation must contain "=" sign (e.g., 2x + 5 = 13)');
+                return;
+            }
+
+            // Split by "="
+            const [leftSide, rightSide] = normalizedEquation.split('=');
+            
+            // Convert to standard form: leftSide - rightSide = 0
+            const standardForm = `${leftSide}-(${rightSide})`;
+            
+            // Expand and simplify
+            const expanded = this.expandAndSimplify(standardForm);
+            
+            // Extract coefficients for ax^2 + bx + c
+            const { isQuadratic, a, b, c, isLinear } = this.extractCoefficients(expanded);
+            
+            if (isQuadratic) {
+                this.solveQuadratic(a, b, c);
+            } else if (isLinear) {
+                this.solveLinear(b, c);
+            } else {
+                this.showError('Invalid equation format. Please use linear (ax + b = 0) or quadratic (ax² + bx + c = 0) format');
+            }
+        } catch (error) {
+            this.showError('Invalid equation: ' + error.message);
+        }
+    }
+
+    expandAndSimplify(expr) {
+        try {
+            // Use math.js to evaluate the expression symbolically
+            // For now, we'll do a simpler approach by checking for x terms
+            return expr;
+        } catch (e) {
+            throw new Error('Failed to parse equation');
+        }
+    }
+
+    extractCoefficients(equation) {
+        // Convert to lowercase for parsing
+        const eq = equation.toLowerCase().replace(/\s+/g, '');
+        
+        // Regex patterns
+        const x2Pattern = /([+-]?\d*)\*?x\^2/g;
+        const xPattern = /([+-]?\d*)\*?x(?!\^)/g;
+        const constantPattern = /([+-]?\d+)(?![x\^])/g;
+        
+        let a = 0, b = 0, c = 0;
+        
+        // Extract x^2 coefficient
+        let match;
+        while ((match = x2Pattern.exec(eq)) !== null) {
+            let coeff = match[1] === '' ? 1 : match[1] === '-' ? -1 : parseFloat(match[1]);
+            a += coeff;
+        }
+        
+        // Extract x coefficient
+        while ((match = xPattern.exec(eq)) !== null) {
+            let coeff = match[1] === '' ? 1 : match[1] === '-' ? -1 : parseFloat(match[1]);
+            b += coeff;
+        }
+        
+        // Simple constant extraction (this is approximate)
+        // For more accuracy, we'd need full symbolic math
+        let constants = [];
+        let tempEq = eq.replace(/[+-]?\d*\.?\d*\*?x\^?2/g, '')
+                       .replace(/[+-]?\d*\.?\d*\*?x/g, '');
+        
+        const parts = tempEq.match(/[+-]?\d+\.?\d*/g) || [];
+        c = parts.reduce((sum, part) => sum + parseFloat(part), 0);
+        
+        return {
+            a: parseFloat(a.toFixed(10)),
+            b: parseFloat(b.toFixed(10)),
+            c: parseFloat(c.toFixed(10)),
+            isQuadratic: a !== 0,
+            isLinear: a === 0 && b !== 0
+        };
+    }
+
+    solveLinear(b, c) {
+        if (b === 0) {
+            this.showError('Invalid linear equation: coefficient of x cannot be zero');
+            return;
+        }
+        
+        // bx + c = 0 → x = -c/b
+        const x = -c / b;
+        
+        this.displaySolution([x.toFixed(4)]);
+        
+        const steps = `
+            <div class="solver-step">
+                <strong>Linear Equation: ${b.toFixed(2)}x + ${c.toFixed(2)} = 0</strong>
+            </div>
+            <div class="solver-step">
+                Step 1: Move constant to right side
+                <br><code>${b.toFixed(2)}x = -${c.toFixed(2)}</code>
+            </div>
+            <div class="solver-step">
+                Step 2: Divide by coefficient of x
+                <br><code>x = -${c.toFixed(2)} / ${b.toFixed(2)}</code>
+            </div>
+            <div class="solver-step">
+                <strong>Solution: x = ${x.toFixed(4)}</strong>
+            </div>
+        `;
+        
+        this.stepsDiv.innerHTML = steps;
+        this.resultsDiv.style.display = 'block';
+    }
+
+    solveQuadratic(a, b, c) {
+        if (a === 0) {
+            this.showError('This is not a quadratic equation');
+            return;
+        }
+        
+        // Using quadratic formula: x = (-b ± √(b² - 4ac)) / 2a
+        const discriminant = b * b - 4 * a * c;
+        
+        let solutions = [];
+        if (discriminant > 0) {
+            // Two real solutions
+            const sqrtDisc = Math.sqrt(discriminant);
+            const x1 = (-b + sqrtDisc) / (2 * a);
+            const x2 = (-b - sqrtDisc) / (2 * a);
+            solutions = [x1.toFixed(4), x2.toFixed(4)];
+            
+            this.displaySolution(solutions);
+            
+            const steps = `
+                <div class="solver-step">
+                    <strong>Quadratic Equation: ${a.toFixed(2)}x² + ${b.toFixed(2)}x + ${c.toFixed(2)} = 0</strong>
+                </div>
+                <div class="solver-step">
+                    <strong>Quadratic Formula:</strong> x = (-b ± √(b² - 4ac)) / 2a
+                </div>
+                <div class="solver-step">
+                    Step 1: Calculate discriminant (Δ)
+                    <br><code>Δ = b² - 4ac</code>
+                    <br><code>Δ = (${b.toFixed(2)})² - 4(${a.toFixed(2)})(${c.toFixed(2)})</code>
+                    <br><code>Δ = ${(b * b).toFixed(2)} - ${(4 * a * c).toFixed(2)}</code>
+                    <br><code>Δ = ${discriminant.toFixed(2)}</code>
+                </div>
+                <div class="solver-step">
+                    Step 2: Since Δ > 0, there are two real solutions
+                    <br><code>√Δ = √${discriminant.toFixed(2)} = ${Math.sqrt(discriminant).toFixed(4)}</code>
+                </div>
+                <div class="solver-step">
+                    Step 3: Apply quadratic formula
+                    <br><code>x₁ = (-${b.toFixed(2)} + ${Math.sqrt(discriminant).toFixed(4)}) / (2 × ${a.toFixed(2)})</code>
+                    <br><code>x₁ = ${x1.toFixed(4)}</code>
+                    <br><code>x₂ = (-${b.toFixed(2)} - ${Math.sqrt(discriminant).toFixed(4)}) / (2 × ${a.toFixed(2)})</code>
+                    <br><code>x₂ = ${x2.toFixed(4)}</code>
+                </div>
+                <div class="solver-step" style="color: #28a745; font-weight: bold;">
+                    <strong>Solutions: x₁ = ${x1.toFixed(4)}, x₂ = ${x2.toFixed(4)}</strong>
+                </div>
+            `;
+            
+            this.stepsDiv.innerHTML = steps;
+        } else if (discriminant === 0) {
+            // One repeated solution
+            const x = -b / (2 * a);
+            solutions = [x.toFixed(4)];
+            
+            this.displaySolution(solutions);
+            
+            const steps = `
+                <div class="solver-step">
+                    <strong>Quadratic Equation: ${a.toFixed(2)}x² + ${b.toFixed(2)}x + ${c.toFixed(2)} = 0</strong>
+                </div>
+                <div class="solver-step">
+                    Step 1: Calculate discriminant
+                    <br><code>Δ = ${discriminant.toFixed(2)}</code>
+                </div>
+                <div class="solver-step">
+                    Step 2: Since Δ = 0, there is one repeated solution
+                    <br><code>x = -b / 2a = -${b.toFixed(2)} / (2 × ${a.toFixed(2)})</code>
+                    <br><code>x = ${x.toFixed(4)}</code>
+                </div>
+                <div class="solver-step" style="color: #28a745; font-weight: bold;">
+                    <strong>Solution: x = ${x.toFixed(4)} (repeated root)</strong>
+                </div>
+            `;
+            
+            this.stepsDiv.innerHTML = steps;
+        } else {
+            // Complex solutions
+            const realPart = (-b / (2 * a)).toFixed(4);
+            const imagPart = (Math.sqrt(-discriminant) / (2 * a)).toFixed(4);
+            
+            this.displaySolution([
+                `${realPart} + ${imagPart}i`,
+                `${realPart} - ${imagPart}i`
+            ]);
+            
+            const steps = `
+                <div class="solver-step">
+                    <strong>Quadratic Equation: ${a.toFixed(2)}x² + ${b.toFixed(2)}x + ${c.toFixed(2)} = 0</strong>
+                </div>
+                <div class="solver-step">
+                    Step 1: Calculate discriminant
+                    <br><code>Δ = ${discriminant.toFixed(2)}</code>
+                </div>
+                <div class="solver-step">
+                    Step 2: Since Δ < 0, solutions are complex
+                </div>
+                <div class="solver-step">
+                    Step 3: Apply quadratic formula with imaginary numbers
+                    <br><code>x = (-b ± i√|Δ|) / 2a</code>
+                </div>
+                <div class="solver-step" style="color: #17a2b8; font-weight: bold;">
+                    <strong>Solutions:</strong>
+                    <br>x₁ = ${realPart} + ${imagPart}i
+                    <br>x₂ = ${realPart} - ${imagPart}i
+                </div>
+            `;
+            
+            this.stepsDiv.innerHTML = steps;
+        }
+        
+        this.resultsDiv.style.display = 'block';
+    }
+
+    displaySolution(solutions) {
+        const solutionHTML = solutions.map((sol, i) => `
+            <div class="solution-item">
+                <strong>x${solutions.length > 1 ? (i + 1) : ''} = ${sol}</strong>
+            </div>
+        `).join('');
+        
+        this.solutionDiv.innerHTML = solutionHTML;
+    }
+
+    showError(message) {
+        this.errorDiv.textContent = message;
+        this.errorDiv.style.display = 'block';
+    }
+}
+
 class ConstantsLibrary {
     constructor() {
         this.constants = {
@@ -888,6 +1174,7 @@ const converter = new UnitConverter();
 const programmer = new ProgrammerMode();
 const stats = new Statistics();
 const constants = new ConstantsLibrary();
+const solver = new EquationSolver();
 
 // Toggle between calculator, converter, and programmer mode
 document.getElementById('converterToggle').addEventListener('click', () => {
@@ -960,4 +1247,24 @@ document.getElementById('constantsToggle').addEventListener('click', () => {
     programmerSection.style.display = 'none';
     statsSection.style.display = 'none';
     constantsSection.style.display = isConstantsShown ? 'none' : 'block';
+});
+
+document.getElementById('solverToggle').addEventListener('click', () => {
+    const calcSection = document.querySelector('.calculator');
+    const historySection = document.querySelector('.history-section');
+    const converterSection = document.getElementById('converterSection');
+    const programmerSection = document.getElementById('programmerSection');
+    const statsSection = document.getElementById('statsSection');
+    const constantsSection = document.getElementById('constantsSection');
+    const solverSection = document.getElementById('solverSection');
+    
+    const isSolverShown = solverSection.style.display !== 'none';
+    
+    calcSection.style.display = isSolverShown ? 'block' : 'none';
+    historySection.style.display = isSolverShown ? 'block' : 'none';
+    converterSection.style.display = 'none';
+    programmerSection.style.display = 'none';
+    statsSection.style.display = 'none';
+    constantsSection.style.display = 'none';
+    solverSection.style.display = isSolverShown ? 'none' : 'block';
 });
