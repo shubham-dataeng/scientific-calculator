@@ -1,368 +1,196 @@
-# 🧮 Scientific Calculator
+# Scientific Calculator
 
-[![GitHub](https://img.shields.io/badge/GitHub-shubham--dataeng/scientific--calculator-blue)](https://github.com/shubham-dataeng/scientific-calculator)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-green)](https://shubham-dataeng.github.io/scientific-calculator/)
-[![Lighthouse Score](https://img.shields.io/badge/Lighthouse-95/100-brightgreen)](https://github.com/shubham-dataeng/scientific-calculator)
-[![Test Coverage](https://img.shields.io/badge/Test%20Coverage-2500%2B%20cases-blue)](TESTING_GUIDE.md)
+A high-performance scientific calculator built with vanilla JavaScript. Handles complex mathematical operations with proper operator precedence, floating-point precision fixes, and comprehensive edge case handling.
 
-A sleek, high-performance scientific calculator built with vanilla JavaScript, HTML5, and CSS3. Features 45+ functions, advanced capabilities, and production-grade performance optimization.
+**Live:** https://shubham-dataeng.github.io/scientific-calculator/
 
-## 🚀 Quick Start
+---
 
-**Live Site:** [https://shubham-dataeng.github.io/scientific-calculator/](https://shubham-dataeng.github.io/scientific-calculator/)
+## What It Does
 
-Just open the link and start calculating!
+Calculate anything from basic arithmetic to scientific functions without leaving your browser. The calculator parses expressions like a real calculator would, respects operator precedence (PEMDAS/BODMAS), and handles the floating-point precision issues that trip up naive implementations.
 
-### Features at a Glance
+---
 
-✨ **Core Calculator**
-- 20+ mathematical functions
-- Trigonometry (sin, cos, tan, asin, acos, atan)
-- Hyperbolic functions
-- Logarithms & exponentials
-- Factorial & combinations
-- Modulo & absolute value
+## Features
 
-🔧 **Advanced Tools**
-- **Unit Converter:** 25 units across 4 categories (length, weight, temperature, volume)
-- **Programmer Mode:** Binary, hex, octal, decimal conversion + 6 bitwise operations
-- **Statistics:** Mean, median, mode, variance, standard deviation, count, sum
-- **Equation Solver:** Linear & quadratic equations with step-by-step solutions
-- **Constants Library:** 16 physics, math, and chemistry constants
-
-⚙️ **User Experience**
-- Dark/light theme toggle
-- Precision control (0-15 decimal places)
+**Core Math**
+- Basic operations: addition, subtraction, multiplication, division
+- 20+ functions: trigonometry (sin, cos, tan, inverse trig), logarithms, factorial, powers
+- Hyperbolic functions, absolute value, modulo operations
+- Full parentheses support with proper operator precedence
 - Scientific notation mode
-- Full calculation history
+
+**Advanced Tools**
+- Unit converter: 25 units across length, weight, temperature, volume
+- Programmer mode: binary, hex, octal, decimal conversion with bitwise operations (AND, OR, XOR, etc.)
+- Basic statistics: mean, median, mode, variance, standard deviation
+- Equation solver: linear and quadratic equations with step-by-step solutions
+- Constants library: 16 physics and math constants
+
+**User Experience**
+- Dark/light theme toggle with localStorage persistence
+- Calculation history you can reference and delete individual entries
 - Memory functions (M+, M-, MR, MC)
-- Keyboard shortcuts (Ctrl+H for help)
-- Settings persistence
+- Keyboard support (Ctrl+H for help, Ctrl+C to copy)
+- Responsive design that works on mobile
 
-🎯 **Performance**
-- ⚡ 0.8s page load (68% improvement)
-- 📦 95 KB bundle (gzip)
-- 📊 95/100 Lighthouse score
-- 🔄 Lazy-loaded math.js
-- 💾 Offline mode (PWA)
-
----
-
-## 📊 Project Stats
-
-| Metric | Value |
-|--------|-------|
-| **Features** | 45+ |
-| **Test Cases** | 2,500+ |
-| **Test Pass Rate** | 98%+ |
-| **Code Lines** | 2,500+ |
-| **Page Load** | 0.8s |
-| **Bundle Size** | 95 KB (gzip) |
-| **Lighthouse** | 95/100 |
-| **Commits** | 9 |
+**Under the Hood**
+- Safe mathematical expression parsing using math.js instead of eval()
+- Performance-optimized with lazy loading of the math library
+- Offline-capable as a PWA with service worker
+- Automatic browser caching for repeat visits
 
 ---
 
-## 🎯 How to Use
+## How It Works
 
-### Basic Calculation
-1. Enter numbers and operators
-2. Press `=` to calculate
-3. Use `C` to clear, `←` to backspace
+The calculator does DOM manipulation through event listeners on buttons and inputs. When you enter an expression, the app validates input, parses the formula to respect operator precedence, then evaluates it safely using math.js.
 
-### Scientific Functions
-- Click function buttons (sin, cos, log, etc.)
-- Or type in formula bar directly
-- Press `=` to evaluate
+Floating-point arithmetic gets special attention. Instead of the classic `0.1 + 0.2 !== 0.3` problem, results are rounded with higher precision intermediate calculations. Large numbers get checked against JavaScript's safe integer limit, and division by zero returns a user-friendly error instead of silently producing Infinity.
 
-### Advanced Features
-- **Unit Converter Tab:** Select category → Enter value → See conversions
-- **Programmer Tab:** Enter decimal → See binary/hex/octal conversions
-- **Statistics Tab:** Add numbers → Click statistic → View result
-- **Equation Tab:** Enter coefficients → See solution with steps
-- **Constants Tab:** Browse and insert physics constants
+The parser handles nested parentheses correctly and throws specific error messages (not just "error"). The modular JavaScript structure separates concerns: the `Calculator` class handles computation, `UnitConverter` does conversions, `ProgrammerMode` handles base operations, etc. Each feature is isolated so changes don't cascade.
 
-### Keyboard Shortcuts
-```
-Ctrl+H     Help modal
-Ctrl+C     Copy result
-Enter      Calculate
-Backspace  Delete digit
-C          Clear all
-```
+For performance, math.js only loads when you actually calculate something (lazy loading), not on initial page load. Static assets are cached aggressively via HTTP headers. The layout uses CSS Grid for responsive UI that adapts from mobile to desktop without looking janky.
 
 ---
 
-## 📁 Project Structure
+## Running Locally
 
-```
-scientific-calculator/           # Root - Application Files
-├── index.html                   # Main app shell (entry point)
-├── script.js                    # Calculator engine (1,302 lines)
-├── style.css                    # Responsive styling (1,388 lines)
-├── manifest.json                # PWA metadata
-├── service-worker.js            # Offline support
-├── performance-monitor.js       # Performance tracking
-├── calc-worker.js               # Web Worker (optional)
-├── .htaccess                    # Server config (caching/security)
-├── README.md                    # Project overview (this file)
-│
-├── docs/                        # 📚 Documentation Folder
-│   ├── README.md                # Documentation index
-│   ├── DEPLOYMENT_GUIDE.md      # How to deploy & monitor
-│   ├── PERFORMANCE_GUIDE.md     # Performance optimizations
-│   ├── TESTING_GUIDE.md         # Testing instructions
-│   ├── QA_FINAL_REPORT.md       # Quality metrics
-│   └── BUG_REPORT.md            # Bug documentation & fixes
-│
-└── tests/                       # 🧪 Testing Folder
-    ├── README.md                # Testing guide
-    ├── test-runner.html         # Test UI (run tests visually)
-    └── calculator-test-suite.js # Test framework (2,500+ cases)
-```
-
----
-
-## 🚀 Deployment
-
-### Current Status
-✅ **LIVE & PRODUCTION READY**
-
-**URL:** https://shubham-dataeng.github.io/scientific-calculator/
-
-### How It's Deployed
-- **Host:** GitHub Pages (free)
-- **CDN:** Global distribution
-- **SSL:** Automatic HTTPS
-- **Updates:** Automatic on git push
-
-### Deploy Your Changes
 ```bash
-# 1. Make changes locally
-# 2. Commit changes
-git add -A
-git commit -m "Your change description"
+# Clone and navigate to directory
+git clone https://github.com/shubham-dataeng/scientific-calculator.git
+cd scientific-calculator
 
-# 3. Push to GitHub
-git push origin main
+# Start a local server
+python3 -m http.server 8000
+# or
+npx http-server
 
-# 4. Wait 10-30 seconds
-# ✅ Live immediately!
+# Open browser
+http://localhost:8000
 ```
 
-See [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) for full details.
+If you just want to look at code, everything's in three files:
+- `index.html` - structure
+- `script.js` - all logic (1,300+ lines but well-organized)
+- `style.css` - styling with dark mode support
 
 ---
 
-## 🧪 Testing
+## Testing
 
-### Run Test Suite
+Automated test suite with 2,500+ test cases covering arithmetic, scientific functions, edge cases, and operator precedence.
+
 ```bash
-# Option 1: Open in browser
-# Open: tests/test-runner.html
+# Open test runner in browser
+# Navigate to /tests/test-runner.html
 
-# Option 2: Console
-# F12 → Console → Run test suite manually
+# Or run in console
 const ts = new CalculatorTestSuite();
 ts.runAllTests();
 ```
 
-### Test Coverage
-- ✅ Arithmetic operations (500+ tests)
-- ✅ Scientific functions (400+ tests)
-- ✅ Edge cases (600+ tests)
-- ✅ Operator precedence (700+ tests)
-- ✅ Precision handling (300+ tests)
-
-**Result:** 98%+ pass rate, 2,500+ total tests
-
-See [tests/README.md](tests/README.md) and [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md) for details.
+Results: 98%+ pass rate. Tests validate floating-point handling, large number behavior, input validation, and error messages.
 
 ---
 
-## 📈 Performance
+## Tech Stack
 
-### Optimization Techniques
-1. **Lazy Loading** - math.js loads on first use
-2. **Async Scripts** - Non-blocking script loading
-3. **Critical CSS** - Inline for faster rendering
-4. **HTTP Caching** - 1-year cache for static assets
-5. **Gzip Compression** - 73% size reduction
-6. **Performance Monitoring** - Real-time metrics dashboard
-7. **Resource Preloading** - DNS prefetch, preload hints
-8. **Web Workers** - Optional background calculations
+- **JavaScript (ES6+)** - modular classes, arrow functions, const/let
+- **HTML5** - semantic markup, accessibility attributes
+- **CSS3** - Grid layout, CSS variables for theming, media queries for responsive UI
+- **math.js v11** - safe expression evaluation
+- **Web APIs** - localStorage, Service Workers, Web Workers
+- **No frameworks** - vanilla JS throughout
 
-### Performance Metrics
+---
+
+## Performance
+
+- Page loads in ~0.8 seconds (68% improvement through lazy loading and caching)
+- Calculations average 42ms
+- 95/100 Lighthouse score
+- Bundle size: 95 KB gzipped (73% reduction from optimization)
+
+Math.js loads only on first calculation, not on initial page load. CSS is deferred, critical styles inline. HTTP headers set aggressive caching for static assets.
+
+---
+
+## Known Quirks
+
+- Very large numbers lose precision (JavaScript limitation at MAX_SAFE_INTEGER)
+- Negative square root returns the imaginary result (math.js behavior)
+- 0^0 returns 1 (matches JavaScript standard behavior, not universal agreement)
+
+These are documented in [docs/BUG_REPORT.md](docs/BUG_REPORT.md) with context on why each happens.
+
+---
+
+## Deployment
+
+Deployed on GitHub Pages. Push to main branch, changes are live in seconds.
+
+```bash
+git add -A
+git commit -m "Your change"
+git push origin main
 ```
-Page Load:              0.8s (68% improvement)
-First Contentful Paint: 0.4s (67% improvement)
-Calculation Time:       42ms average
-Memory Usage:           15-25 MB
-Bundle Size:            95 KB gzip (73% reduction)
+
+The site updates automatically via GitHub Pages. No build step needed since it's vanilla JS. HTTP caching means repeat visitors see cached assets; first-time visitors get fresh content.
+
+---
+
+## Folder Structure
+
 ```
-
-### View Performance
-1. Click "📊 Perf" button (bottom right)
-2. Or press F12 → Console → `perfMonitor.showPerformanceDashboard()`
-
-See [docs/PERFORMANCE_GUIDE.md](docs/PERFORMANCE_GUIDE.md) for details.
-
----
-
-## 🐛 Known Issues & Fixes
-
-### Recent Fixes (Phase 6 QA)
-✅ Floating-point precision
-✅ Division by zero handling
-✅ Error message clarity
-✅ Regex edge cases
-✅ Large number overflow
-✅ Input validation
-✅ Performance optimization
-
-### Remaining Limitations
-⚠️ Negative square root (math.js limitation)
-⚠️ 0^0 returns 1 (JavaScript standard)
-⚠️ Very large numbers (precision limits)
-
-See [docs/BUG_REPORT.md](docs/BUG_REPORT.md) for full list.
-
----
-
-## 🛠️ Technology Stack
-
-- **HTML5** - Semantic markup, meta tags
-- **CSS3** - Grid layout, transitions, animations
-- **JavaScript (ES6+)** - OOP, event handling
-- **math.js v11.11.0** - Safe expression evaluation
-- **Web APIs** - localStorage, Service Worker, Web Worker
-- **PWA** - Offline support, installable
-
----
-
-## 📱 Browser Support
-
-| Browser | Version | Status |
-|---------|---------|--------|
-| Chrome | Latest | ✅ Full support |
-| Firefox | Latest | ✅ Full support |
-| Safari | Latest | ✅ Full support |
-| Edge | Latest | ✅ Full support |
-| Mobile Safari | Latest | ✅ Full support |
-| Mobile Chrome | Latest | ✅ Full support |
-
----
-
-## 📚 Documentation
-
-| Document | Purpose |
-|----------|---------|
-| [README.md](README.md) | Project overview (you are here) |
-| [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) | How to deploy & monitor |
-| [docs/PERFORMANCE_GUIDE.md](docs/PERFORMANCE_GUIDE.md) | Performance optimizations |
-| [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md) | How to run tests |
-| [docs/QA_FINAL_REPORT.md](docs/QA_FINAL_REPORT.md) | Quality metrics & findings |
-| [docs/BUG_REPORT.md](docs/BUG_REPORT.md) | Bug documentation & fixes |
-| [tests/README.md](tests/README.md) | Testing guide |
-| [docs/README.md](docs/README.md) | Documentation index |
-
----
-
-## 🎓 Development Phases
-
-### Completed Phases
-✅ **Phase 1** - Core functions, math.js, precision, copy, history
-✅ **Phase 2** - Help modal, scientific notation, settings, theme
-✅ **Phase 3** - Unit converter, programmer mode
-✅ **Phase 4** - Statistics, constants, PWA support
-✅ **Phase 5** - Equation solver (linear & quadratic)
-✅ **Phase 6** - Performance optimization
-✅ **QA Phase** - 2,500+ test cases, bug fixes
-
-### Git History
-```
-473c389 Phase 6: Performance Optimization
-72ca1c5 Add comprehensive QA final report
-aa345de QA Testing Framework
-63fd992 Phase 5: Equation solver
-0dec200 Phase 4: Statistics & Constants
-ee0c2dd Phase 3: Unit converter & Programmer
-73d06f7 Phase 2: Help & Settings
-7a8208d Phase 1: Core features
-540e79f Initial commit
+scientific-calculator/
+├── index.html              # App shell
+├── script.js               # Calculator engine (modular classes)
+├── style.css               # Styles, dark mode, responsive grid
+├── manifest.json           # PWA metadata
+├── service-worker.js       # Offline support
+├── performance-monitor.js  # Runtime metrics
+├── .htaccess               # Server caching/security config
+├── README.md               # This file
+│
+├── docs/                   # Documentation
+│   ├── DEPLOYMENT_GUIDE.md
+│   ├── PERFORMANCE_GUIDE.md
+│   ├── TESTING_GUIDE.md
+│   ├── QA_FINAL_REPORT.md
+│   └── BUG_REPORT.md
+│
+└── tests/                  # Test suite
+    ├── test-runner.html
+    └── calculator-test-suite.js
 ```
 
 ---
 
-## 👤 Author
+## Why I Built This
 
-**Shubham Patel**
-- GitHub: [@shubham-dataeng](https://github.com/shubham-dataeng)
-- Repository: [scientific-calculator](https://github.com/shubham-dataeng/scientific-calculator)
+Wanted to explore how to handle real-world challenges in a calculator: operator precedence parsing, floating-point precision, responsive UI that doesn't break on mobile, offline functionality. Also tried keeping code modular and readable instead of spaghetti logic.
 
----
-
-## 📄 License
-
-This project is open source and available under the MIT License.
+Most of it is vanilla JavaScript to understand the fundamentals without leaning on frameworks. The test suite was a good exercise in generating edge cases and validating behavior systematically.
 
 ---
 
-## 🤝 Contributing
+## Future Improvements
 
-Found a bug or have a feature request?
-
-1. Open an [Issue](https://github.com/shubham-dataeng/scientific-calculator/issues)
-2. Fork the repo
-3. Create a feature branch
-4. Push changes and create a Pull Request
-
----
-
-## ✨ Highlights
-
-- 🎯 **Comprehensive** - 45+ features covering basic to advanced calculations
-- ⚡ **Fast** - 0.8s page load, 42ms calculations
-- 🔒 **Safe** - No eval(), uses math.js for expression evaluation
-- 📱 **Responsive** - Works on mobile, tablet, desktop
-- 🌙 **Dark Mode** - Eye-friendly theme toggle
-- 🧪 **Tested** - 2,500+ automated test cases
-- 📊 **Monitored** - Real-time performance dashboard
-- 📦 **Optimized** - 95 KB gzip, lazy loading, caching
-- 🔄 **Offline** - PWA with service worker
-- 🚀 **Deployed** - Live on GitHub Pages
+- Graph plotting for functions
+- Matrix operations
+- Unit conversion with more categories
+- Keyboard shortcuts for more operations
+- Dark mode that respects system preference (already works in some browsers)
+- More unit tests for new features
 
 ---
 
-## 🎉 Status
+## License
 
-**PRODUCTION READY** ✅
-
-- All features implemented
-- Comprehensive testing (98%+ pass rate)
-- Performance optimized (Lighthouse 95/100)
-- Deployed & live
-- Monitored & maintained
+MIT
 
 ---
 
-## 🔗 Quick Links
-
-- **Live Site:** https://shubham-dataeng.github.io/scientific-calculator/
-- **Repository:** https://github.com/shubham-dataeng/scientific-calculator
-- **Issues:** https://github.com/shubham-dataeng/scientific-calculator/issues
-- **Commits:** https://github.com/shubham-dataeng/scientific-calculator/commits/main
-
----
-
-## 📞 Support
-
-**Help Features:**
-- Press `Ctrl+H` on live site for built-in help
-- Hover over buttons for tooltips
-- See [TESTING_GUIDE.md](TESTING_GUIDE.md) for advanced usage
-- See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for deployment help
-
----
-
-**Made with ❤️ by Shubham Patel**
+**Built by Shubham Patel** | [GitHub](https://github.com/shubham-dataeng) | [Live Demo](https://shubham-dataeng.github.io/scientific-calculator/)
