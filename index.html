@@ -13,6 +13,14 @@
             <div class="mode-toggle">
                 <button class="toggle-btn" id="modeToggle">Show Scientific</button>
                 <button class="toggle-btn theme-toggle" id="themeToggle">🌙 Dark</button>
+                <select id="precisionSelect" class="precision-select" title="Decimal Places">
+                    <option value="2">2 decimals</option>
+                    <option value="4" selected>4 decimals</option>
+                    <option value="6">6 decimals</option>
+                    <option value="8">8 decimals</option>
+                    <option value="10">10 decimals</option>
+                    <option value="15">15 decimals</option>
+                </select>
             </div>
 
             <div class="display-section">
@@ -76,11 +84,27 @@
                 </div>
 
                 <div class="btn-container full">
+                    <button class="operator" data-func="asin">sin⁻¹</button>
+                    <button class="operator" data-func="acos">cos⁻¹</button>
+                    <button class="operator" data-func="atan">tan⁻¹</button>
                     <button class="operator" data-func="log">log</button>
                     <button class="operator" data-func="ln">ln</button>
+                </div>
+
+                <div class="btn-container full">
+                    <button class="operator" data-func="sinh">sinh</button>
+                    <button class="operator" data-func="cosh">cosh</button>
+                    <button class="operator" data-func="tanh">tanh</button>
                     <button class="operator" data-func="exp">e^x</button>
-                    <button class="operator" data-func="fact">n!</button>
                     <button class="operator" data-op="e">e</button>
+                </div>
+
+                <div class="btn-container full">
+                    <button class="operator" data-func="fact">n!</button>
+                    <button class="operator" data-func="abs">|x|</button>
+                    <button class="operator" data-func="percent">%</button>
+                    <button class="operator" data-func="cbrt">∛</button>
+                    <button style="opacity: 0; cursor: default;"></button>
                 </div>
 
                 <div class="memory-controls">
@@ -105,6 +129,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -6,6 +6,7 @@ class Calculator {
         this.angleMode = localStorage.getItem('angleMode') || 'deg';
         this.history = JSON.parse(localStorage.getItem('calcHistory')) || [];
         this.isAdvanced = false;
+        this.precision = Number(localStorage.getItem('calcPrecision')) || 4;
         
         this.initElements();
         this.attachEventListeners();
@@ -20,6 +21,10 @@ class Calculator {
         this.themeToggle = document.getElementById('themeToggle');
         this.advancedSection = document.getElementById('advancedSection');
         this.angleModeContainer = document.getElementById('angleModeContainer');
+        this.precisionSelect = document.getElementById('precisionSelect');
+        
+        // Set precision selector value
+        this.precisionSelect.value = this.precision;
         
         // Load theme preference
         this.theme = localStorage.getItem('calcTheme') || 'light';
@@ -30,6 +35,22 @@ class Calculator {
         
         // Load memory display
         document.getElementById('memValue').textContent = this.memory;
+        
+        // Add click to copy functionality
+        this.resultDisplay.addEventListener('click', () => {
+            if (this.result !== '0' && this.result !== 'Invalid Expression') {
+                navigator.clipboard.writeText(this.result);
+                
+                this.resultDisplay.classList.add('copied');
+                const originalText = this.resultDisplay.textContent;
+                this.resultDisplay.textContent = '✓ Copied!';
+                
+                setTimeout(() => {
+                    this.resultDisplay.classList.remove('copied');
+                    this.resultDisplay.textContent = originalText;
+                }, 1500);
+            }
+        });
     }
 
     attachEventListeners() {
@@ -51,6 +72,11 @@ class Calculator {
         document.getElementById('clearHistory').addEventListener('click', () => this.clearHistory());
         document.getElementById('modeToggle').addEventListener('click', () => this.toggleMode());
         document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
+        document.getElementById('precisionSelect').addEventListener('change', (e) => {
+            this.precision = Number(e.target.value);
+            localStorage.setItem('calcPrecision', this.precision);
+            this.updateDisplay();
+        });
 
         document.getElementById('memAdd').addEventListener('click', () => this.memoryOp('add'));
         document.getElementById('memSub').addEventListener('click', () => this.memoryOp('sub'));
@@ -110,9 +136,17 @@ class Calculator {
             case 'sin':
             case 'cos':
             case 'tan':
+            case 'asin':
+            case 'acos':
+            case 'atan':
+            case 'sinh':
+            case 'cosh':
+            case 'tanh':
             case 'log':
             case 'ln':
             case 'sqrt':
+            case 'cbrt':
+            case 'abs':
                 this.formula += func + '(';
                 break;
             case 'fact':
@@ -120,6 +154,9 @@ class Calculator {
                 break;
             case 'exp':
                 this.formula += 'exp(';
+                break;
+            case 'percent':
+                this.formula += '%';
                 break;
             case 'pi':
                 if (lastChar && !['(', '+', '-', '*', '/', '^'].includes(lastChar)) {
@@ -135,39 +172,35 @@ class Calculator {
         try {
             let expr = this.formula;
             
-            // Replace π with Math.PI
-            expr = expr.replace(/π/g, Math.PI);
-            
-            // Replace e with Math.E
-            expr = expr.replace(/\be\b/g, Math.E);
-            
-            // Handle trigonometric functions with proper parentheses
-            expr = expr.replace(/sin\(([^)]+)\)/g,
-                (_, x) => `Math.sin(${this.angleMode === 'deg' ? 'Math.PI/180*' : ''}(${x}))`
-            );
-
-            expr = expr.replace(/cos\(([^)]+)\)/g,
-                (_, x) => `Math.cos(${this.angleMode === 'deg' ? 'Math.PI/180*' : ''}(${x}))`
-            );
-
-            expr = expr.replace(/tan\(([^)]+)\)/g,
-                (_, x) => `Math.tan(${this.angleMode === 'deg' ? 'Math.PI/180*' : ''}(${x}))`
-            );
-            
-            // Handle functions
-            expr = expr.replace(/sqrt\(/g, 'Math.sqrt(');
-            expr = expr.replace(/log\(/g, 'Math.log10(');
-            expr = expr.replace(/ln\(/g, 'Math.log(');
-            expr = expr.replace(/exp\(/g, 'Math.exp(');
-            
-            // Handle power operator
+            // Replace display symbols with math.js compatible versions
+            expr = expr.replace(/π/g, 'pi');
             expr = expr.replace(/\^/g, '**');
+            expr = expr.replace(/÷/g, '/');
+            expr = expr.replace(/×/g, '*');
+            expr = expr.replace(/−/g, '-');
             
-            // Calculate factorial separately
-            expr = this.handleFactorial(expr);
+            // Handle angle conversions for trig functions
+            if (this.angleMode === 'deg') {
+                expr = expr.replace(/sin\(([^)]+)\)/g, 'sin(pi/180*($1))');
+                expr = expr.replace(/cos\(([^)]+)\)/g, 'cos(pi/180*($1))');
+                expr = expr.replace(/tan\(([^)]+)\)/g, 'tan(pi/180*($1))');
+                expr = expr.replace(/asin\(([^)]+)\)/g, '180/pi*asin($1)');
+                expr = expr.replace(/acos\(([^)]+)\)/g, '180/pi*acos($1)');
+                expr = expr.replace(/atan\(([^)]+)\)/g, '180/pi*atan($1)');
+            }
             
-            const result = eval(expr);
-            this.result = (Math.round(result * 100000000) / 100000000).toString();
+            // Replace e with Math.E for math.js
+            expr = expr.replace(/\be\b/g, 'e');
+            
+            // Handle percentage
+            expr = expr.replace(/(\d+)%/g, '($1/100)');
+            
+            // Use math.js to evaluate safely
+            const result = math.evaluate(expr);
+            
+            // Apply precision
+            const multiplier = Math.pow(10, this.precision);
+            this.result = (Math.round(result * multiplier) / multiplier).toString();
             
             this.addToHistory(this.formula, this.result);
             this.formula = this.result;
@@ -176,17 +209,6 @@ class Calculator {
             this.result = 'Invalid Expression';
             this.updateDisplay();
         }
-    }
-
-    handleFactorial(expr) {
-        return expr.replace(/(\([^()]+\)|\d+)!/g, (match, value) => {
-            let n = eval(value);
-            if (n < 0 || !Number.isInteger(n)) return NaN;
-
-            let res = 1;
-            for (let i = 2; i <= n; i++) res *= i;
-            return res;
-        });
     }
 
     clear() {
@@ -220,17 +242,32 @@ class Calculator {
         
         this.historyList.innerHTML = this.history.map((item, idx) => `
             <div class="history-item" data-idx="${idx}">
-                <div class="history-formula">${this.escapeHtml(item.formula)}</div>
-                <div class="history-result">= ${this.escapeHtml(item.result)}</div>
+                <div>
+                    <div class="history-formula">${this.escapeHtml(item.formula)}</div>
+                    <div class="history-result">= ${this.escapeHtml(item.result)}</div>
+                </div>
+                <button class="history-delete-btn" data-idx="${idx}">Delete</button>
             </div>
         `).join('');
 
         document.querySelectorAll('.history-item').forEach(item => {
-            item.addEventListener('click', () => {
+            const content = item.querySelector('div');
+            content.addEventListener('click', () => {
                 const idx = item.dataset.idx;
                 this.formula = this.history[idx].formula;
                 this.result = this.history[idx].result;
                 this.updateDisplay();
+            });
+        });
+
+        // Add delete functionality
+        document.querySelectorAll('.history-delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = btn.dataset.idx;
+                this.history.splice(idx, 1);
+                localStorage.setItem('calcHistory', JSON.stringify(this.history));
+                this.renderHistory();
             });
         });
     }

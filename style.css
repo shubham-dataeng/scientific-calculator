@@ -74,6 +74,19 @@ body.dark-mode .display-section {
     font-weight: 600;
     word-wrap: break-word;
     word-break: break-all;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.result:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.result.copied {
+    background: rgba(76, 175, 80, 0.3);
 }
 
 .btn-container {
@@ -222,6 +235,29 @@ body.dark-mode .history-section h3 {
     cursor: pointer;
     transition: all 0.2s ease;
     border-left: 4px solid #667eea;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history-delete-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.history-item:hover .history-delete-btn {
+    opacity: 1;
+}
+
+.history-delete-btn:hover {
+    background: #ee5a52;
 }
 
 body.dark-mode .history-item {
@@ -286,6 +322,35 @@ body.dark-mode .history-result {
     display: flex;
     gap: 10px;
     justify-content: center;
+    flex-wrap: wrap;
+}
+
+.precision-select {
+    padding: 8px 12px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.precision-select:hover {
+    background: #5568d3;
+}
+
+.precision-select option {
+    background: #333;
+    color: white;
+}
+
+body.dark-mode .precision-select {
+    background: #3a3a52;
+}
+
+body.dark-mode .precision-select:hover {
+    background: #4a4a62;
 }
 
 .toggle-btn {
