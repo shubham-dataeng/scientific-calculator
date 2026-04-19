@@ -15,6 +15,8 @@
                 <button class="toggle-btn theme-toggle" id="themeToggle">🌙 Dark</button>
                 <button class="toggle-btn" id="helpBtn" title="Keyboard Shortcuts">? Help</button>
                 <button class="toggle-btn" id="notationToggle" title="Scientific Notation">Notation</button>
+                <button class="toggle-btn" id="converterToggle" title="Unit Converter">🔄 Converter</button>
+                <button class="toggle-btn" id="programmerToggle" title="Programmer Mode">💻 Prog</button>
                 <button class="toggle-btn" id="settingsBtn" title="Settings">⚙️</button>
                 <select id="precisionSelect" class="precision-select" title="Decimal Places">
                     <option value="2">2 decimals</option>
@@ -129,6 +131,82 @@
                 <div class="empty-history">No calculations yet</div>
             </div>
             <button class="clear-history" id="clearHistory">Clear History</button>
+        </div>
+    </div>
+
+    <!-- Unit Converter -->
+    <div id="converterSection" class="converter-section" style="display: none;">
+        <h3>🔄 Unit Converter</h3>
+        
+        <div class="converter-group">
+            <label>Category:</label>
+            <select id="converterCategory" class="converter-select">
+                <option value="length">Length</option>
+                <option value="weight">Weight</option>
+                <option value="temperature">Temperature</option>
+                <option value="volume">Volume</option>
+            </select>
+        </div>
+
+        <div class="converter-input-group">
+            <div class="converter-item">
+                <label>From:</label>
+                <input type="number" id="converterFrom" placeholder="Enter value" class="converter-input">
+                <select id="converterFromUnit" class="converter-select"></select>
+            </div>
+            
+            <button class="swap-btn" id="swapUnits">⇄</button>
+            
+            <div class="converter-item">
+                <label>To:</label>
+                <input type="number" id="converterTo" placeholder="Result" class="converter-input" readonly>
+                <select id="converterToUnit" class="converter-select"></select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Programmer Mode -->
+    <div id="programmerSection" class="programmer-section" style="display: none;">
+        <h3>💻 Programmer Mode</h3>
+        
+        <div class="base-converter">
+            <div class="base-item">
+                <label>Decimal:</label>
+                <input type="number" id="progDecimal" class="prog-input">
+            </div>
+            
+            <div class="base-item">
+                <label>Binary:</label>
+                <input type="text" id="progBinary" class="prog-input" placeholder="0b...">
+            </div>
+
+            <div class="base-item">
+                <label>Hexadecimal:</label>
+                <input type="text" id="progHex" class="prog-input" placeholder="0x...">
+            </div>
+
+            <div class="base-item">
+                <label>Octal:</label>
+                <input type="text" id="progOctal" class="prog-input" placeholder="0o...">
+            </div>
+        </div>
+
+        <h4>Bitwise Operations</h4>
+        <div class="bitwise-controls">
+            <div class="bit-input-group">
+                <input type="number" id="bitNum1" class="bit-input" placeholder="Number 1">
+                <select id="bitwiseOp" class="bit-select">
+                    <option value="and">AND (&)</option>
+                    <option value="or">OR (|)</option>
+                    <option value="xor">XOR (^)</option>
+                    <option value="not">NOT (~)</option>
+                    <option value="lshift">Left Shift (<<)</option>
+                    <option value="rshift">Right Shift (>>)</option>
+                </select>
+                <input type="number" id="bitNum2" class="bit-input" placeholder="Number 2">
+            </div>
+            <button class="bit-calc-btn" id="bitwiseCalc">Calculate</button>
+            <div class="bit-result" id="bitResult">Result will appear here</div>
         </div>
     </div>
 

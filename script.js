@@ -474,4 +474,270 @@ class Calculator {
     }
 }
 
+class UnitConverter {
+    constructor() {
+        this.categories = {
+            length: {
+                name: 'Length',
+                units: {
+                    mm: { label: 'Millimeter (mm)', factor: 0.001 },
+                    cm: { label: 'Centimeter (cm)', factor: 0.01 },
+                    m: { label: 'Meter (m)', factor: 1 },
+                    km: { label: 'Kilometer (km)', factor: 1000 },
+                    in: { label: 'Inch (in)', factor: 0.0254 },
+                    ft: { label: 'Foot (ft)', factor: 0.3048 },
+                    yd: { label: 'Yard (yd)', factor: 0.9144 },
+                    mi: { label: 'Mile (mi)', factor: 1609.34 }
+                }
+            },
+            weight: {
+                name: 'Weight',
+                units: {
+                    mg: { label: 'Milligram (mg)', factor: 0.001 },
+                    g: { label: 'Gram (g)', factor: 1 },
+                    kg: { label: 'Kilogram (kg)', factor: 1000 },
+                    lb: { label: 'Pound (lb)', factor: 453.592 },
+                    oz: { label: 'Ounce (oz)', factor: 28.3495 },
+                    ton: { label: 'Metric Ton (t)', factor: 1000000 }
+                }
+            },
+            temperature: {
+                name: 'Temperature',
+                units: {
+                    c: { label: 'Celsius (°C)', convert: 'temp' },
+                    f: { label: 'Fahrenheit (°F)', convert: 'temp' },
+                    k: { label: 'Kelvin (K)', convert: 'temp' }
+                }
+            },
+            volume: {
+                name: 'Volume',
+                units: {
+                    ml: { label: 'Milliliter (ml)', factor: 1 },
+                    l: { label: 'Liter (l)', factor: 1000 },
+                    gal: { label: 'US Gallon (gal)', factor: 3785.41 },
+                    cup: { label: 'US Cup (cup)', factor: 236.588 },
+                    pt: { label: 'Pint (pt)', factor: 473.176 }
+                }
+            }
+        };
+
+        this.initElements();
+        this.attachListeners();
+    }
+
+    initElements() {
+        this.categorySelect = document.getElementById('converterCategory');
+        this.fromUnitSelect = document.getElementById('converterFromUnit');
+        this.toUnitSelect = document.getElementById('converterToUnit');
+        this.fromInput = document.getElementById('converterFrom');
+        this.toInput = document.getElementById('converterTo');
+        this.swapBtn = document.getElementById('swapUnits');
+
+        this.updateUnitOptions('length');
+    }
+
+    attachListeners() {
+        this.categorySelect.addEventListener('change', (e) => {
+            this.updateUnitOptions(e.target.value);
+        });
+
+        this.fromInput.addEventListener('input', () => this.convert());
+        this.fromUnitSelect.addEventListener('change', () => this.convert());
+        this.toUnitSelect.addEventListener('change', () => this.convert());
+
+        this.swapBtn.addEventListener('click', () => {
+            [this.fromUnitSelect.value, this.toUnitSelect.value] = 
+            [this.toUnitSelect.value, this.fromUnitSelect.value];
+            this.convert();
+        });
+    }
+
+    updateUnitOptions(category) {
+        const units = this.categories[category].units;
+        const unitKeys = Object.keys(units);
+
+        this.fromUnitSelect.innerHTML = unitKeys.map(key => 
+            `<option value="${key}">${units[key].label}</option>`
+        ).join('');
+
+        this.toUnitSelect.innerHTML = unitKeys.map((key, idx) => 
+            `<option value="${key}" ${idx === 1 ? 'selected' : ''}>${units[key].label}</option>`
+        ).join('');
+
+        this.convert();
+    }
+
+    convert() {
+        const from = this.fromInput.value;
+        if (!from || isNaN(from)) {
+            this.toInput.value = '';
+            return;
+        }
+
+        const category = this.categorySelect.value;
+        const fromUnit = this.fromUnitSelect.value;
+        const toUnit = this.toUnitSelect.value;
+        const units = this.categories[category].units;
+
+        let result;
+        
+        if (category === 'temperature') {
+            result = this.convertTemperature(parseFloat(from), fromUnit, toUnit);
+        } else {
+            const toBase = parseFloat(from) * units[fromUnit].factor;
+            result = toBase / units[toUnit].factor;
+        }
+
+        this.toInput.value = (Math.round(result * 10000) / 10000).toString();
+    }
+
+    convertTemperature(value, from, to) {
+        let celsius;
+        
+        if (from === 'c') celsius = value;
+        else if (from === 'f') celsius = (value - 32) * 5/9;
+        else if (from === 'k') celsius = value - 273.15;
+
+        if (to === 'c') return celsius;
+        else if (to === 'f') return celsius * 9/5 + 32;
+        else if (to === 'k') return celsius + 273.15;
+    }
+}
+
+class ProgrammerMode {
+    constructor() {
+        this.initElements();
+        this.attachListeners();
+    }
+
+    initElements() {
+        this.decimalInput = document.getElementById('progDecimal');
+        this.binaryInput = document.getElementById('progBinary');
+        this.hexInput = document.getElementById('progHex');
+        this.octalInput = document.getElementById('progOctal');
+        this.bitNum1 = document.getElementById('bitNum1');
+        this.bitNum2 = document.getElementById('bitNum2');
+        this.bitwiseOp = document.getElementById('bitwiseOp');
+        this.bitwiseCalcBtn = document.getElementById('bitwiseCalc');
+        this.bitResult = document.getElementById('bitResult');
+    }
+
+    attachListeners() {
+        this.decimalInput.addEventListener('input', () => this.updateFromDecimal());
+        this.binaryInput.addEventListener('input', () => this.updateFromBinary());
+        this.hexInput.addEventListener('input', () => this.updateFromHex());
+        this.octalInput.addEventListener('input', () => this.updateFromOctal());
+        this.bitwiseCalcBtn.addEventListener('click', () => this.calculateBitwise());
+    }
+
+    updateFromDecimal() {
+        const decimal = parseInt(this.decimalInput.value);
+        if (isNaN(decimal)) return;
+
+        this.binaryInput.value = '0b' + decimal.toString(2);
+        this.hexInput.value = '0x' + decimal.toString(16).toUpperCase();
+        this.octalInput.value = '0o' + decimal.toString(8);
+    }
+
+    updateFromBinary() {
+        const binary = this.binaryInput.value.replace('0b', '');
+        const decimal = parseInt(binary, 2);
+        if (isNaN(decimal)) return;
+
+        this.decimalInput.value = decimal;
+        this.hexInput.value = '0x' + decimal.toString(16).toUpperCase();
+        this.octalInput.value = '0o' + decimal.toString(8);
+    }
+
+    updateFromHex() {
+        const hex = this.hexInput.value.replace('0x', '');
+        const decimal = parseInt(hex, 16);
+        if (isNaN(decimal)) return;
+
+        this.decimalInput.value = decimal;
+        this.binaryInput.value = '0b' + decimal.toString(2);
+        this.octalInput.value = '0o' + decimal.toString(8);
+    }
+
+    updateFromOctal() {
+        const octal = this.octalInput.value.replace('0o', '');
+        const decimal = parseInt(octal, 8);
+        if (isNaN(decimal)) return;
+
+        this.decimalInput.value = decimal;
+        this.binaryInput.value = '0b' + decimal.toString(2);
+        this.hexInput.value = '0x' + decimal.toString(16).toUpperCase();
+    }
+
+    calculateBitwise() {
+        const num1 = parseInt(this.bitNum1.value);
+        const num2 = parseInt(this.bitNum2.value);
+        const operation = this.bitwiseOp.value;
+
+        if (isNaN(num1) || (operation !== 'not' && isNaN(num2))) {
+            this.bitResult.textContent = 'Invalid input';
+            return;
+        }
+
+        let result;
+        switch (operation) {
+            case 'and':
+                result = num1 & num2;
+                this.bitResult.textContent = `${num1} & ${num2} = ${result}`;
+                break;
+            case 'or':
+                result = num1 | num2;
+                this.bitResult.textContent = `${num1} | ${num2} = ${result}`;
+                break;
+            case 'xor':
+                result = num1 ^ num2;
+                this.bitResult.textContent = `${num1} ^ ${num2} = ${result}`;
+                break;
+            case 'not':
+                result = ~num1;
+                this.bitResult.textContent = `~${num1} = ${result}`;
+                break;
+            case 'lshift':
+                result = num1 << num2;
+                this.bitResult.textContent = `${num1} << ${num2} = ${result}`;
+                break;
+            case 'rshift':
+                result = num1 >> num2;
+                this.bitResult.textContent = `${num1} >> ${num2} = ${result}`;
+                break;
+        }
+    }
+}
+
 const calc = new Calculator();
+const converter = new UnitConverter();
+const programmer = new ProgrammerMode();
+
+// Toggle between calculator, converter, and programmer mode
+document.getElementById('converterToggle').addEventListener('click', () => {
+    const calcSection = document.querySelector('.calculator');
+    const historySection = document.querySelector('.history-section');
+    const converterSection = document.getElementById('converterSection');
+    const programmerSection = document.getElementById('programmerSection');
+    
+    const isConverterShown = converterSection.style.display !== 'none';
+    
+    calcSection.style.display = isConverterShown ? 'block' : 'none';
+    historySection.style.display = isConverterShown ? 'block' : 'none';
+    converterSection.style.display = isConverterShown ? 'none' : 'block';
+    programmerSection.style.display = 'none';
+});
+
+document.getElementById('programmerToggle').addEventListener('click', () => {
+    const calcSection = document.querySelector('.calculator');
+    const historySection = document.querySelector('.history-section');
+    const converterSection = document.getElementById('converterSection');
+    const programmerSection = document.getElementById('programmerSection');
+    
+    const isProgrammerShown = programmerSection.style.display !== 'none';
+    
+    calcSection.style.display = isProgrammerShown ? 'block' : 'none';
+    historySection.style.display = isProgrammerShown ? 'block' : 'none';
+    converterSection.style.display = 'none';
+    programmerSection.style.display = isProgrammerShown ? 'none' : 'block';
+});
