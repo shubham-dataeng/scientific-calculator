@@ -13,6 +13,9 @@
             <div class="mode-toggle">
                 <button class="toggle-btn" id="modeToggle">Show Scientific</button>
                 <button class="toggle-btn theme-toggle" id="themeToggle">🌙 Dark</button>
+                <button class="toggle-btn" id="helpBtn" title="Keyboard Shortcuts">? Help</button>
+                <button class="toggle-btn" id="notationToggle" title="Scientific Notation">Notation</button>
+                <button class="toggle-btn" id="settingsBtn" title="Settings">⚙️</button>
                 <select id="precisionSelect" class="precision-select" title="Decimal Places">
                     <option value="2">2 decimals</option>
                     <option value="4" selected>4 decimals</option>
@@ -127,6 +130,89 @@
             </div>
             <button class="clear-history" id="clearHistory">Clear History</button>
         </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeHelp">&times;</span>
+            <h2>⌨️ Keyboard Shortcuts</h2>
+            <div class="shortcuts-grid">
+                <div class="shortcut">
+                    <kbd>0-9</kbd> <span>Type numbers</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>+</kbd> <kbd>-</kbd> <kbd>*</kbd> <kbd>/</kbd> <span>Operations</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>.</kbd> <span>Decimal point</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>(</kbd> <kbd>)</kbd> <span>Parentheses</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>Enter</kbd> <span>Calculate result</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>Backspace</kbd> <span>Delete last digit</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>Escape</kbd> <span>Clear all</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>Ctrl</kbd> + <kbd>H</kbd> <span>Show this help</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>Ctrl</kbd> + <kbd>C</kbd> <span>Copy result</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="settings-panel">
+        <button class="close-settings" id="closeSettings">&times;</button>
+        <h3>⚙️ Settings</h3>
+        
+        <div class="settings-group">
+            <label>Angle Mode:</label>
+            <select id="settingAngleMode" class="setting-select">
+                <option value="deg">Degrees (°)</option>
+                <option value="rad">Radians (rad)</option>
+            </select>
+        </div>
+
+        <div class="settings-group">
+            <label>Decimal Precision:</label>
+            <select id="settingPrecision" class="setting-select">
+                <option value="2">2 decimals</option>
+                <option value="4">4 decimals</option>
+                <option value="6">6 decimals</option>
+                <option value="8">8 decimals</option>
+                <option value="10">10 decimals</option>
+                <option value="15">15 decimals</option>
+            </select>
+        </div>
+
+        <div class="settings-group">
+            <label>Theme:</label>
+            <div class="setting-options">
+                <button class="setting-btn" id="settingLight">☀️ Light</button>
+                <button class="setting-btn" id="settingDark">🌙 Dark</button>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <label>Notation Display:</label>
+            <div class="setting-toggle">
+                <label>
+                    <input type="checkbox" id="settingNotation">
+                    Scientific Notation
+                </label>
+            </div>
+        </div>
+
+        <button class="setting-btn reset-btn" id="resetSettings">Reset to Defaults</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>

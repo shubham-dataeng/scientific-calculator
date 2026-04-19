@@ -7,6 +7,7 @@ class Calculator {
         this.history = JSON.parse(localStorage.getItem('calcHistory')) || [];
         this.isAdvanced = false;
         this.precision = Number(localStorage.getItem('calcPrecision')) || 4;
+        this.scientificNotation = localStorage.getItem('calcNotation') === 'true' || false;
         
         this.initElements();
         this.attachEventListeners();
@@ -51,6 +52,24 @@ class Calculator {
                 }, 1500);
             }
         });
+
+        // Initialize settings panel
+        document.getElementById('settingAngleMode').value = this.angleMode;
+        document.getElementById('settingPrecision').value = this.precision;
+        document.getElementById('settingNotation').checked = this.scientificNotation;
+
+        // Set theme buttons opacity
+        if (this.theme === 'dark') {
+            document.getElementById('settingDark').style.opacity = '1';
+            document.getElementById('settingLight').style.opacity = '0.6';
+        } else {
+            document.getElementById('settingLight').style.opacity = '1';
+            document.getElementById('settingDark').style.opacity = '0.6';
+        }
+
+        // Set notation toggle opacity
+        this.notationToggle = document.getElementById('notationToggle');
+        this.notationToggle.style.opacity = this.scientificNotation ? '1' : '0.6';
     }
 
     attachEventListeners() {
@@ -94,6 +113,97 @@ class Calculator {
             // Set active button based on saved preference
             if (btn.dataset.mode === this.angleMode) {
                 btn.classList.add('active');
+            }
+        });
+
+        // Help modal
+        document.getElementById('helpBtn').addEventListener('click', () => {
+            document.getElementById('helpModal').style.display = 'block';
+        });
+
+        document.getElementById('closeHelp').addEventListener('click', () => {
+            document.getElementById('helpModal').style.display = 'none';
+        });
+
+        // Settings panel
+        document.getElementById('settingsBtn').addEventListener('click', () => {
+            document.getElementById('settingsPanel').classList.toggle('active');
+        });
+
+        document.getElementById('closeSettings').addEventListener('click', () => {
+            document.getElementById('settingsPanel').classList.remove('active');
+        });
+
+        // Settings options
+        document.getElementById('settingAngleMode').addEventListener('change', (e) => {
+            this.angleMode = e.target.value;
+            localStorage.setItem('angleMode', this.angleMode);
+            document.querySelectorAll('.angle-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === this.angleMode);
+            });
+        });
+
+        document.getElementById('settingPrecision').addEventListener('change', (e) => {
+            this.precision = Number(e.target.value);
+            localStorage.setItem('calcPrecision', this.precision);
+            this.precisionSelect.value = this.precision;
+            this.updateDisplay();
+        });
+
+        document.getElementById('settingLight').addEventListener('click', () => {
+            document.body.classList.remove('dark-mode');
+            this.theme = 'light';
+            localStorage.setItem('calcTheme', this.theme);
+            document.getElementById('settingLight').style.opacity = '1';
+            document.getElementById('settingDark').style.opacity = '0.6';
+            this.themeToggle.textContent = '🌙 Dark';
+        });
+
+        document.getElementById('settingDark').addEventListener('click', () => {
+            document.body.classList.add('dark-mode');
+            this.theme = 'dark';
+            localStorage.setItem('calcTheme', this.theme);
+            document.getElementById('settingDark').style.opacity = '1';
+            document.getElementById('settingLight').style.opacity = '0.6';
+            this.themeToggle.textContent = '☀ Light';
+        });
+
+        document.getElementById('settingNotation').addEventListener('change', (e) => {
+            this.scientificNotation = e.target.checked;
+            localStorage.setItem('calcNotation', this.scientificNotation);
+            this.notationToggle.style.opacity = this.scientificNotation ? '1' : '0.6';
+            this.updateDisplay();
+        });
+
+        document.getElementById('resetSettings').addEventListener('click', () => {
+            if (confirm('Reset all settings to defaults?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        });
+
+        // Notation toggle
+        this.notationToggle.addEventListener('click', () => {
+            this.scientificNotation = !this.scientificNotation;
+            localStorage.setItem('calcNotation', this.scientificNotation);
+            this.notationToggle.style.opacity = this.scientificNotation ? '1' : '0.6';
+            this.updateDisplay();
+        });
+
+        // Keyboard shortcut for help
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'h') {
+                e.preventDefault();
+                document.getElementById('helpModal').style.display = 
+                    document.getElementById('helpModal').style.display === 'block' ? 'none' : 'block';
+            }
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('helpModal');
+            if (e.target === modal) {
+                modal.style.display = 'none';
             }
         });
 
@@ -206,7 +316,17 @@ class Calculator {
             this.formula = this.result;
             this.updateDisplay();
         } catch (e) {
-            this.result = 'Invalid Expression';
+            // Better error messages
+            const errorMsg = e.message.toLowerCase();
+            if (errorMsg.includes('divide')) {
+                this.result = 'Division by zero';
+            } else if (errorMsg.includes('parenthes')) {
+                this.result = 'Unmatched parentheses';
+            } else if (errorMsg.includes('syntax')) {
+                this.result = 'Syntax error';
+            } else {
+                this.result = 'Invalid Expression';
+            }
             this.updateDisplay();
         }
     }
@@ -224,7 +344,17 @@ class Calculator {
 
     updateDisplay() {
         this.formulaDisplay.textContent = this.formula;
-        this.resultDisplay.textContent = this.result;
+        
+        if (this.scientificNotation && this.result !== '0' && this.result !== 'Invalid Expression') {
+            const num = parseFloat(this.result);
+            if (!isNaN(num) && (Math.abs(num) > 1e6 || Math.abs(num) < 1e-4)) {
+                this.resultDisplay.textContent = num.toExponential(this.precision - 1);
+            } else {
+                this.resultDisplay.textContent = this.result;
+            }
+        } else {
+            this.resultDisplay.textContent = this.result;
+        }
     }
 
     addToHistory(formula, result) {
