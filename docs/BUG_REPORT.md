@@ -151,11 +151,12 @@ function bugFix_InputValidation(formula) {
 // ISSUE: Expression like "2+3*4" relies on math.js for precedence
 // If math.js has different rules, results differ
 // SEVERITY: Low (math.js is reliable)
-// IMPACT: User expects standard PEMDAS
+// IMPACT: User expects standard BODMAS (Brackets, Orders, Division/Multiplication, Addition/Subtraction)
 
 function bugFix_OperatorPrecedence() {
-    // math.js respects PEMDAS/BODMAS:
-    // 2 + 3 * 4 = 2 + 12 = 14 ✓
+    // math.js respects BODMAS:
+    // BODMAS = Brackets, Orders (exponents), Division/Multiplication (left to right), Addition/Subtraction (left to right)
+    // Example: 2 + 3 * 4 = 2 + 12 = 14 ✓ (multiplication before addition)
     // This is correct and math.js handles it properly
     return true;
 }

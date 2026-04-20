@@ -1,10 +1,9 @@
-/**
- * SCIENTIFIC CALCULATOR - PERFORMANCE MONITORING
- * Real-time performance tracking and optimization metrics
- */
+// Performance Monitor - tracks calculation speed, memory, and UI responsiveness
+// Helps identify bottlenecks and measure optimization impact
 
 class PerformanceMonitor {
     constructor() {
+        // Track various performance metrics
         this.metrics = {
             pageLoadTime: 0,
             firstPaint: 0,
@@ -16,8 +15,12 @@ class PerformanceMonitor {
             renderTimes: []
         };
         
+        // Define acceptable performance thresholds
         this.thresholds = {
-            pageLoad: 2000,      // 2 seconds
+            pageLoad: 2000,      // Page should load in under 2 seconds
+            calculation: 100,    // Calculations should be under 100ms
+            render: 16,          // Render frames in 16ms for 60 FPS
+            memory: 50           // Keep memory under 50MB
             calculation: 500,    // 500ms
             rendering: 100,      // 100ms
             memory: 50 * 1024 * 1024  // 50MB
@@ -167,25 +170,11 @@ class PerformanceMonitor {
         const avgMemory = this.getAverageMemory();
         
         const dashboard = `
-╔═══════════════════════════════════════════════════╗
-║         📊 PERFORMANCE METRICS                     ║
-╠═══════════════════════════════════════════════════╣
-║                                                   ║
-║ Page Load Time:      ${this.metrics.pageLoadTime.toString().padEnd(25, ' ')} ms ║
-║ First Paint:         ${(this.metrics.firstPaint || 0).toFixed(2).padEnd(25, ' ')} ms ║
-║ First Contentful:    ${(this.metrics.firstContentfulPaint || 0).toFixed(2).padEnd(25, ' ')} ms ║
-║                                                   ║
-║ Calculations:        ${this.metrics.calculationTimes.length.toString().padEnd(25, ' ')} total ║
-║ Avg Calc Time:       ${avgCalcTime.toFixed(2).padEnd(25, ' ')} ms ║
-║ Min Calc Time:       ${Math.min(...this.metrics.calculationTimes).toFixed(2).padEnd(25, ' ')} ms ║
-║ Max Calc Time:       ${Math.max(...this.metrics.calculationTimes).toFixed(2).padEnd(25, ' ')} ms ║
-║                                                   ║
-║ Memory Usage:        ${(avgMemory / 1024 / 1024).toFixed(2).padEnd(25, ' ')} MB (avg) ║
-║ Peak Memory:         ${(maxMemory / 1024 / 1024).toFixed(2).padEnd(25, ' ')} MB ║
-║                                                   ║
-║ 🟢 STATUS: ${this.getPerformanceStatus().padEnd(37, ' ')} ║
-║                                                   ║
-╚═══════════════════════════════════════════════════╝
+Performance Metrics:
+- Page Load Time: ${this.metrics.pageLoadTime}ms
+- Avg Calc Time: ${avgCalcTime.toFixed(2)}ms
+- Peak Memory: ${(maxMemory / 1024 / 1024).toFixed(2)}MB
+- Status: ${this.getPerformanceStatus()}
         `;
         
         console.log(dashboard);

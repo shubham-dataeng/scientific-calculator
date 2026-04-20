@@ -1,20 +1,13 @@
-class Calculator {
-    constructor() {
-        this.formula = '0';
-        this.result = '0';
-        this.memory = Number(localStorage.getItem('calcMemory')) || 0;
-        this.angleMode = localStorage.getItem('angleMode') || 'deg';
-        this.history = JSON.parse(localStorage.getItem('calcHistory')) || [];
-        this.isAdvanced = false;
-        this.precision = Number(localStorage.getItem('calcPrecision')) || 4;
-        this.scientificNotation = localStorage.getItem('calcNotation') === 'true' || false;
-        
-        this.initElements();
-        this.attachEventListeners();
-        this.renderHistory();
-    }
+// Scientific Calculator - Main Logic
+// Handles all calculation, UI updates, and user interaction
+// Uses math.js to safely evaluate expressions with proper operator precedence
+
+
+
+class Calculator {\n    constructor() {\n        // Display state\n        this.formula = '0';\n        this.result = '0';\n        \n        // User preferences (loaded from browser storage)\n        this.memory = Number(localStorage.getItem('calcMemory')) || 0;\n        this.angleMode = localStorage.getItem('angleMode') || 'deg';\n        this.history = JSON.parse(localStorage.getItem('calcHistory')) || [];\n        this.theme = localStorage.getItem('calcTheme') || 'light';\n        this.precision = Number(localStorage.getItem('calcPrecision')) || 4;\n        this.scientificNotation = localStorage.getItem('calcNotation') === 'true';\n        \n        // UI state\n        this.isAdvanced = false; // Whether scientific mode is showing\n        \n        // Setup UI and attach handlers\n        this.initElements();\n        this.attachEventListeners();\n        this.renderHistory();\n    }
 
     initElements() {
+        // Cache DOM elements for faster access throughout the app
         this.formulaDisplay = document.getElementById('formula');
         this.resultDisplay = document.getElementById('result');
         this.historyList = document.getElementById('historyList');
@@ -23,29 +16,37 @@ class Calculator {
         this.advancedSection = document.getElementById('advancedSection');
         this.angleModeContainer = document.getElementById('angleModeContainer');
         this.precisionSelect = document.getElementById('precisionSelect');
+        this.notationToggle = document.getElementById('notationToggle');
         
-        // Set precision selector value
+        // Initialize precision setting
         this.precisionSelect.value = this.precision;
         
-        // Load theme preference
-        this.theme = localStorage.getItem('calcTheme') || 'light';
+        // Apply saved theme on startup
         if (this.theme === 'dark') {
             document.body.classList.add('dark-mode');
             this.themeToggle.textContent = '☀ Light';
+            document.getElementById('settingDark').style.opacity = '1';
+            document.getElementById('settingLight').style.opacity = '0.6';
+        } else {
+            document.getElementById('settingLight').style.opacity = '1';
+            document.getElementById('settingDark').style.opacity = '0.6';
         }
         
-        // Load memory display
+        // Show memory value on startup
         document.getElementById('memValue').textContent = this.memory;
         
-        // Add click to copy functionality
+        // Make result clickable to copy to clipboard
         this.resultDisplay.addEventListener('click', () => {
-            if (this.result !== '0' && this.result !== 'Invalid Expression') {
+            const isValidResult = this.result !== '0' && this.result !== 'Invalid Expression';
+            if (isValidResult) {
                 navigator.clipboard.writeText(this.result);
                 
+                // Show "Copied!" feedback
                 this.resultDisplay.classList.add('copied');
                 const originalText = this.resultDisplay.textContent;
                 this.resultDisplay.textContent = '✓ Copied!';
                 
+                // Restore original text after 1.5 seconds
                 setTimeout(() => {
                     this.resultDisplay.classList.remove('copied');
                     this.resultDisplay.textContent = originalText;
@@ -53,22 +54,12 @@ class Calculator {
             }
         });
 
-        // Initialize settings panel
+        // Initialize settings panel controls
         document.getElementById('settingAngleMode').value = this.angleMode;
         document.getElementById('settingPrecision').value = this.precision;
         document.getElementById('settingNotation').checked = this.scientificNotation;
-
-        // Set theme buttons opacity
-        if (this.theme === 'dark') {
-            document.getElementById('settingDark').style.opacity = '1';
-            document.getElementById('settingLight').style.opacity = '0.6';
-        } else {
-            document.getElementById('settingLight').style.opacity = '1';
-            document.getElementById('settingDark').style.opacity = '0.6';
-        }
-
-        // Set notation toggle opacity
-        this.notationToggle = document.getElementById('notationToggle');
+        
+        // Update notation button visibility
         this.notationToggle.style.opacity = this.scientificNotation ? '1' : '0.6';
     }
 
@@ -211,30 +202,52 @@ class Calculator {
     }
 
     appendNumber(num) {
+        // Prevent formula from getting too long
         if (this.formula.length > 40) return;
         
+        // Handle replacing the initial zero
         if (this.formula === '0' && num !== '.') {
             this.formula = num;
-        } else if (num === '.') {
-            const parts = this.formula.split(/[\+\-\*\/\^\(\)]/);
-            if (parts[parts.length - 1].includes('.')) return;
-            this.formula += num;
-        } else {
-            this.formula += num;
+            this.updateDisplay();
+            return;
         }
+        
+        // Only allow one decimal point per number
+        if (num === '.') {
+            const numberParts = this.formula.split(/[\+\-\*\/\^\(\)]/);
+            const lastNumberPart = numberParts[numberParts.length - 1];
+            
+            // Check if decimal already exists in current number
+            if (lastNumberPart.includes('.')) {
+                return; // Don't add another decimal
+            }
+        }
+        
+        this.formula += num;
         this.updateDisplay();
     }
 
     appendOperator(op) {
-        const lastChar = this.formula[this.formula.length - 1];
-        if (['+', '-', '*', '/', '^', '(', '.'].includes(lastChar)) {
-            if (op === '-' && lastChar !== ')') {
+        const lastCharacter = this.formula[this.formula.length - 1];
+        const invalidPreviousChars = ['+', '-', '*', '/', '^', '(', '.'];
+        
+        // Handle case where last character is already an operator
+        if (invalidPreviousChars.includes(lastCharacter)) {
+            // Allow minus after close bracket or operator (for negative numbers)
+            if (op === '-' && lastCharacter !== ')') {
                 this.formula += op;
-            } else if (!['(', '.'].includes(op)) {
+                this.updateDisplay();
+                return;
+            }
+            
+            // Replace operator if next one is not ( or .
+            if (!['(', '.'].includes(op)) {
                 this.formula = this.formula.slice(0, -1) + op;
             }
             return;
         }
+        
+        // Normal case: add the operator
         this.formula += op;
         this.updateDisplay();
     }
@@ -242,39 +255,33 @@ class Calculator {
     applyFunction(func) {
         const lastChar = this.formula[this.formula.length - 1];
         
-        switch(func) {
-            case 'sin':
-            case 'cos':
-            case 'tan':
-            case 'asin':
-            case 'acos':
-            case 'atan':
-            case 'sinh':
-            case 'cosh':
-            case 'tanh':
-            case 'log':
-            case 'ln':
-            case 'sqrt':
-            case 'cbrt':
-            case 'abs':
-                this.formula += func + '(';
-                break;
-            case 'fact':
-                this.formula += '!';
-                break;
-            case 'exp':
-                this.formula += 'exp(';
-                break;
-            case 'percent':
-                this.formula += '%';
-                break;
-            case 'pi':
-                if (lastChar && !['(', '+', '-', '*', '/', '^'].includes(lastChar)) {
-                    this.formula += '*';
-                }
-                this.formula += 'π';
-                break;
+        // Most math functions need parentheses
+        const functionsWithParens = [
+            'sin', 'cos', 'tan', 
+            'asin', 'acos', 'atan',
+            'sinh', 'cosh', 'tanh',
+            'log', 'ln', 'sqrt', 'cbrt', 'abs'
+        ];
+        
+        if (functionsWithParens.includes(func)) {
+            this.formula += func + '(';
+        } else if (func === 'fact') {
+            // Factorial goes after the number
+            this.formula += '!';
+        } else if (func === 'exp') {
+            // e^x function
+            this.formula += 'exp(';
+        } else if (func === 'percent') {
+            this.formula += '%';
+        } else if (func === 'pi') {
+            // Auto-multiply if pi follows a number or closing bracket
+            const needsMultiply = lastChar && !['(', '+', '-', '*', '/', '^'].includes(lastChar);
+            if (needsMultiply) {
+                this.formula += '*';
+            }
+            this.formula += 'π';
         }
+        
         this.updateDisplay();
     }
 
@@ -282,14 +289,14 @@ class Calculator {
         try {
             let expr = this.formula;
             
-            // INPUT VALIDATION - Fix #7
+            // Skip if empty or just "0"
             if (!expr || expr.trim() === '' || expr === '0') {
                 this.result = '0';
                 this.updateDisplay();
                 return;
             }
             
-            // Replace display symbols with math.js compatible versions
+            // Convert display symbols to math.js format
             expr = expr.replace(/π/g, 'pi');
             expr = expr.replace(/\^/g, '**');
             expr = expr.replace(/÷/g, '/');
@@ -306,7 +313,7 @@ class Calculator {
                 expr = expr.replace(/atan\(([^)]+)\)/g, '180/pi*atan($1)');
             }
             
-            // Better e replacement - Fix #6 (only replace standalone 'e')
+            // Replace Euler's number (avoid replacing 'e' in variable names)
             expr = expr.replace(/\be(?=[+\-*/\)\(^]|$)/g, '(2.718281828459045)');
             
             // Handle percentage
@@ -315,7 +322,7 @@ class Calculator {
             // Use math.js to evaluate safely
             let result = math.evaluate(expr);
             
-            // HANDLE SPECIAL VALUES - Fix #1, #2, #3, #4
+            // Check for Infinity, NaN, or other special values
             if (!isFinite(result)) {
                 if (isNaN(result)) {
                     this.result = 'Error: Invalid operation';
@@ -328,12 +335,12 @@ class Calculator {
                 return;
             }
             
-            // CHECK RANGE - Fix #5 (Large numbers)
+            // Warn if result is outside safe integer range
             if (Math.abs(result) > Number.MAX_SAFE_INTEGER) {
                 console.warn('Result exceeds safe integer range');
             }
             
-            // IMPROVED PRECISION ROUNDING - Fix #2 (Floating point precision)
+            // Apply precision rounding to avoid floating point errors
             const highPrecisionFactor = Math.pow(10, Math.max(this.precision + 2, 15));
             const highPrecisionRounded = Math.round(result * highPrecisionFactor) / highPrecisionFactor;
             
@@ -345,7 +352,7 @@ class Calculator {
             this.formula = this.result;
             this.updateDisplay();
         } catch (e) {
-            // IMPROVED ERROR MESSAGES - Fix #8
+            // Show user-friendly error messages
             const errorMsg = e.message.toLowerCase();
             if (errorMsg.includes('divide')) {
                 this.result = 'Cannot divide by zero';
@@ -376,34 +383,58 @@ class Calculator {
     }
 
     updateDisplay() {
+        // Show the formula being typed
         this.formulaDisplay.textContent = this.formula;
         
-        if (this.scientificNotation && this.result !== '0' && this.result !== 'Invalid Expression') {
-            const num = parseFloat(this.result);
-            if (!isNaN(num) && (Math.abs(num) > 1e6 || Math.abs(num) < 1e-4)) {
-                this.resultDisplay.textContent = num.toExponential(this.precision - 1);
+        // Use scientific notation for very large/small numbers if enabled
+        const shouldUseScientific = this.scientificNotation && 
+                                    this.result !== '0' && 
+                                    this.result !== 'Invalid Expression';
+        
+        if (shouldUseScientific) {
+            const numValue = parseFloat(this.result);
+            const isVeryLargeOrSmall = Math.abs(numValue) > 1e6 || Math.abs(numValue) < 1e-4;
+            
+            if (!isNaN(numValue) && isVeryLargeOrSmall) {
+                this.resultDisplay.textContent = numValue.toExponential(this.precision - 1);
             } else {
                 this.resultDisplay.textContent = this.result;
             }
         } else {
+            // Normal display
             this.resultDisplay.textContent = this.result;
         }
     }
 
     addToHistory(formula, result) {
-        this.history.unshift({ formula, result, timestamp: new Date().toLocaleTimeString() });
-        if (this.history.length > 50) this.history.pop();
+        // Add calculation to top of history
+        const calculationRecord = {
+            formula: formula,
+            result: result,
+            timestamp: new Date().toLocaleTimeString()
+        };
+        
+        this.history.unshift(calculationRecord);
+        
+        // Keep only last 50 calculations to avoid bloating storage
+        if (this.history.length > 50) {
+            this.history.pop();
+        }
+        
+        // Save to browser storage
         localStorage.setItem('calcHistory', JSON.stringify(this.history));
         this.renderHistory();
     }
 
     renderHistory() {
+        // Show empty state if no history
         if (this.history.length === 0) {
             this.historyList.innerHTML = '<div class="empty-history">No calculations yet</div>';
             return;
         }
         
-        this.historyList.innerHTML = this.history.map((item, idx) => `
+        // Build HTML for each history item
+        const historyHTML = this.history.map((item, idx) => `
             <div class="history-item" data-idx="${idx}">
                 <div>
                     <div class="history-formula">${this.escapeHtml(item.formula)}</div>
@@ -412,31 +443,35 @@ class Calculator {
                 <button class="history-delete-btn" data-idx="${idx}">Delete</button>
             </div>
         `).join('');
+        
+        this.historyList.innerHTML = historyHTML;
 
+        // Attach click handlers to load history item
         document.querySelectorAll('.history-item').forEach(item => {
-            const content = item.querySelector('div');
-            content.addEventListener('click', () => {
-                const idx = item.dataset.idx;
-                this.formula = this.history[idx].formula;
-                this.result = this.history[idx].result;
+            const contentArea = item.querySelector('div');
+            contentArea.addEventListener('click', () => {
+                const itemIndex = item.dataset.idx;
+                this.formula = this.history[itemIndex].formula;
+                this.result = this.history[itemIndex].result;
                 this.updateDisplay();
             });
         });
 
-        // Add delete functionality
+        // Attach delete handlers
         document.querySelectorAll('.history-delete-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const idx = btn.dataset.idx;
-                this.history.splice(idx, 1);
+            btn.addEventListener('click', (event) => {
+                event.stopPropagation(); // Don't trigger load
+                const itemIndex = btn.dataset.idx;
+                this.history.splice(itemIndex, 1);
                 localStorage.setItem('calcHistory', JSON.stringify(this.history));
-                this.renderHistory();
+                this.renderHistory(); // Refresh display
             });
         });
     }
 
     clearHistory() {
-        if (confirm('Clear all history?')) {
+        const userConfirmed = confirm('Are you sure you want to clear all history? This cannot be undone.');
+        if (userConfirmed) {
             this.history = [];
             localStorage.removeItem('calcHistory');
             this.renderHistory();
@@ -444,66 +479,121 @@ class Calculator {
     }
 
     toggleMode() {
+        // Switch between basic and scientific calculator
         this.isAdvanced = !this.isAdvanced;
+        
+        // Show/hide advanced buttons
         this.advancedSection.classList.toggle('show');
+        
+        // Show/hide angle mode controls
         this.angleModeContainer.style.display = this.isAdvanced ? 'flex' : 'none';
+        
+        // Update button text
         this.modeToggle.textContent = this.isAdvanced ? 'Hide Scientific' : 'Show Scientific';
+        
+        // Show memory indicator only in advanced mode
         document.getElementById('memDisplay').style.display = this.isAdvanced ? 'inline' : 'none';
     }
 
     toggleTheme() {
+        // Toggle between dark and light themes
         document.body.classList.toggle('dark-mode');
-        this.theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+        
+        // Check which theme is now active
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        this.theme = isDarkMode ? 'dark' : 'light';
+        
+        // Remember user's preference
         localStorage.setItem('calcTheme', this.theme);
-        this.themeToggle.textContent = this.theme === 'dark' ? '☀ Light' : '🌙 Dark';
+        
+        // Update button text and icon
+        this.themeToggle.textContent = isDarkMode ? '☀ Light' : '🌙 Dark';
     }
 
-    memoryOp(op) {
+    memoryOp(operation) {
         try {
             const currentValue = parseFloat(this.result);
-            const btn = document.getElementById(`mem${op.charAt(0).toUpperCase() + op.slice(1)}`);
             
-            switch(op) {
+            switch(operation) {
                 case 'add':
+                    // M+ : Add current value to memory
                     this.memory += currentValue;
-                    btn.classList.add('active');
                     break;
+                    
                 case 'sub':
+                    // M- : Subtract current value from memory
                     this.memory -= currentValue;
-                    btn.classList.add('active');
                     break;
+                    
                 case 'recall':
+                    // MR : Put memory value back into formula
                     this.formula = this.memory.toString();
                     this.result = this.memory.toString();
-                    break;
+                    this.updateDisplay();
+                    return;
+                    
                 case 'clear':
+                    // MC : Clear memory
                     this.memory = 0;
-                    btn.classList.remove('active');
+                    break;
             }
             
-            if (op !== 'recall') {
-                document.getElementById('memValue').textContent = this.memory;
-                localStorage.setItem('calcMemory', this.memory);
-            }
+            // Update memory display and save
+            document.getElementById('memValue').textContent = this.memory;
+            localStorage.setItem('calcMemory', this.memory);
             this.updateDisplay();
-        } catch (e) {
-            console.error('Memory operation failed');
+            
+        } catch (error) {
+            console.error('Memory operation failed:', error);
         }
     }
 
-    handleKeyboard(e) {
-        if (e.key >= '0' && e.key <= '9') this.appendNumber(e.key);
-        if (['+', '-', '*', '/'].includes(e.key)) this.appendOperator(e.key);
-        if (e.key === '.') this.appendNumber('.');
-        if (e.key === '(' || e.key === ')') this.appendOperator(e.key);
-        if (e.key === 'Enter') { e.preventDefault(); this.calculate(); }
-        if (e.key === 'Backspace') { e.preventDefault(); this.delete(); }
-        if (e.key === 'Escape') this.clear();
+    handleKeyboard(event) {
+        const key = event.key;
+        
+        // Handle number keys
+        if (key >= '0' && key <= '9') {
+            this.appendNumber(key);
+        }
+        // Handle basic operators
+        else if (['+', '-', '*', '/'].includes(key)) {
+            this.appendOperator(key);
+        }
+        // Handle decimal point
+        else if (key === '.') {
+            this.appendNumber('.');
+        }
+        // Handle brackets
+        else if (key === '(' || key === ')') {
+            this.appendOperator(key);
+        }
+        // Handle Enter to calculate
+        else if (key === 'Enter') {
+            event.preventDefault();
+            this.calculate();
+        }
+        // Handle Backspace to delete
+        else if (key === 'Backspace') {
+            event.preventDefault();
+            this.delete();
+        }
+        // Handle Escape to clear all
+        else if (key === 'Escape') {
+            this.clear();
+        }
     }
 
     escapeHtml(text) {
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return String(text).replace(/[&<>"']/g, m => map[m]);
+        // Prevent HTML injection by escaping special characters
+        const characterMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        
+        return String(text).replace(/[&<>"']/g, char => characterMap[char]);
     }
 }
 
@@ -664,8 +754,16 @@ class ProgrammerMode {
     }
 
     updateFromDecimal() {
-        const decimal = parseInt(this.decimalInput.value);
-        if (isNaN(decimal)) return;
+        const value = this.decimalInput.value.trim();
+        if (value === '') return;
+        
+        const decimal = parseInt(value, 10);
+        if (isNaN(decimal) || decimal < 0) {
+            this.binaryInput.value = '';
+            this.hexInput.value = '';
+            this.octalInput.value = '';
+            return;
+        }
 
         this.binaryInput.value = '0b' + decimal.toString(2);
         this.hexInput.value = '0x' + decimal.toString(16).toUpperCase();
@@ -673,9 +771,17 @@ class ProgrammerMode {
     }
 
     updateFromBinary() {
-        const binary = this.binaryInput.value.replace('0b', '');
+        const value = this.binaryInput.value.trim();
+        if (value === '') return;
+        
+        const binary = value.replace(/0b/i, '');
         const decimal = parseInt(binary, 2);
-        if (isNaN(decimal)) return;
+        if (isNaN(decimal) || decimal < 0) {
+            this.decimalInput.value = '';
+            this.hexInput.value = '';
+            this.octalInput.value = '';
+            return;
+        }
 
         this.decimalInput.value = decimal;
         this.hexInput.value = '0x' + decimal.toString(16).toUpperCase();
@@ -683,9 +789,17 @@ class ProgrammerMode {
     }
 
     updateFromHex() {
-        const hex = this.hexInput.value.replace('0x', '');
+        const value = this.hexInput.value.trim();
+        if (value === '') return;
+        
+        const hex = value.replace(/0x/i, '');
         const decimal = parseInt(hex, 16);
-        if (isNaN(decimal)) return;
+        if (isNaN(decimal) || decimal < 0) {
+            this.decimalInput.value = '';
+            this.binaryInput.value = '';
+            this.octalInput.value = '';
+            return;
+        }
 
         this.decimalInput.value = decimal;
         this.binaryInput.value = '0b' + decimal.toString(2);
@@ -693,9 +807,17 @@ class ProgrammerMode {
     }
 
     updateFromOctal() {
-        const octal = this.octalInput.value.replace('0o', '');
+        const value = this.octalInput.value.trim();
+        if (value === '') return;
+        
+        const octal = value.replace(/0o/i, '');
         const decimal = parseInt(octal, 8);
-        if (isNaN(decimal)) return;
+        if (isNaN(decimal) || decimal < 0) {
+            this.decimalInput.value = '';
+            this.binaryInput.value = '';
+            this.hexInput.value = '';
+            return;
+        }
 
         this.decimalInput.value = decimal;
         this.binaryInput.value = '0b' + decimal.toString(2);
@@ -858,6 +980,7 @@ class EquationSolver {
     initElements() {
         this.input = document.getElementById('equationInput');
         this.solveBtn = document.getElementById('solveBtn');
+        this.clearBtn = document.getElementById('solverClearBtn');
         this.resultsDiv = document.getElementById('solverResults');
         this.solutionDiv = document.getElementById('solverSolution');
         this.stepsDiv = document.getElementById('solverSteps');
@@ -866,9 +989,17 @@ class EquationSolver {
 
     attachListeners() {
         this.solveBtn.addEventListener('click', () => this.solveEquation());
+        this.clearBtn.addEventListener('click', () => this.clearInput());
         this.input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.solveEquation();
         });
+    }
+
+    clearInput() {
+        this.input.value = '';
+        this.resultsDiv.style.display = 'none';
+        this.errorDiv.style.display = 'none';
+        this.input.focus();
     }
 
     solveEquation() {

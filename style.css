@@ -1,3 +1,5 @@
+/* Scientific Calculator Stylesheet */
+
 * {
     margin: 0;
     padding: 0;
@@ -665,6 +667,7 @@ body.dark-mode .setting-toggle label {
     max-width: 900px;
     width: 100%;
     margin: 0 auto;
+    grid-column: 1 / -1;
 }
 
 body.dark-mode .converter-section {
@@ -767,6 +770,7 @@ body.dark-mode .converter-select {
     max-width: 900px;
     width: 100%;
     margin: 0 auto;
+    grid-column: 1 / -1;
 }
 
 body.dark-mode .programmer-section {
@@ -903,6 +907,7 @@ body.dark-mode .bit-result {
     max-width: 900px;
     width: 100%;
     margin: 0 auto;
+    grid-column: 1 / -1;
 }
 
 body.dark-mode .stats-section {
@@ -1073,6 +1078,7 @@ body.dark-mode .stats-result-item label {
     max-width: 900px;
     width: 100%;
     margin: 0 auto;
+    grid-column: 1 / -1;
 }
 
 body.dark-mode .constants-section {
@@ -1162,12 +1168,16 @@ body.dark-mode .constant-value {
 
 /* Equation Solver Styles */
 .solver-section {
-    flex: 1;
-    padding: 30px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 15px;
+    background: rgba(102, 126, 234, 0.95);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    grid-column: 1 / -1;
     color: white;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 body.dark-mode .solver-section {
@@ -1184,12 +1194,14 @@ body.dark-mode .solver-section {
 
 .solver-input-group {
     margin-bottom: 30px;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
     gap: 12px;
+    align-items: flex-end;
 }
 
 .solver-input-group label {
+    grid-column: 1 / -1;
     font-weight: 600;
     font-size: 14px;
     color: rgba(255, 255, 255, 0.95);
@@ -1238,6 +1250,16 @@ body.dark-mode .solver-section {
 
 .solver-btn:active {
     transform: translateY(0);
+}
+
+.solver-btn.clear-btn {
+    background: #ff6b6b;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.solver-btn.clear-btn:hover {
+    background: #ee5a52;
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
 }
 
 .solver-results {

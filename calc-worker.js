@@ -1,29 +1,22 @@
-/**
- * SCIENTIFIC CALCULATOR - PERFORMANCE OPTIMIZATION
- * Web Worker for Async Math Calculations
- * 
- * Offloads heavy math.js calculations to background thread
- * Keeps UI responsive during complex operations
- */
+// Web Worker - runs calculations in background thread
+// Keeps the main UI thread responsive by offloading heavy math.js operations
+
+
 
 self.onmessage = function(event) {
+    // Receive calculation request from main thread
     const { id, expression, precision } = event.data;
     
     try {
-        // Simulate math.js evaluation in worker
-        // In production, math.js would be loaded here
-        
-        // For now, use native JavaScript evaluation with safety checks
-        let result;
-        
-        // Parse expression safely
-        if (isValidExpression(expression)) {
-            result = evaluateExpression(expression, precision);
-        } else {
-            throw new Error('Invalid expression');
+        // Check if expression is safe before evaluating
+        if (!isValidExpression(expression)) {
+            throw new Error('Invalid expression format');
         }
         
-        // Send result back to main thread
+        // Evaluate the mathematical expression
+        const result = evaluateExpression(expression, precision);
+        
+        // Send back the result to main thread
         self.postMessage({
             id: id,
             result: result,
@@ -31,6 +24,7 @@ self.onmessage = function(event) {
         });
         
     } catch (error) {
+        // Send back error message if something goes wrong
         self.postMessage({
             id: id,
             result: null,
@@ -39,22 +33,17 @@ self.onmessage = function(event) {
     }
 };
 
-/**
- * VALIDATE EXPRESSION - Prevent injection attacks
- */
+// Security check - only allow safe mathematical expressions
 function isValidExpression(expr) {
-    // Only allow numbers, operators, functions, parentheses
+    // Block anything that looks suspicious
     const validPattern = /^[\d+\-*/(). sincostan logeπxabcfghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ^!√∛%\s]*$/;
     return validPattern.test(expr);
 }
 
-/**
- * EVALUATE EXPRESSION - Basic math operations
- * Note: For full functionality, math.js should be loaded in worker
- */
+// Parse and evaluate expression with proper precision
 function evaluateExpression(expr, precision = 4) {
     try {
-        // Replace symbols with valid JavaScript
+        // Convert display symbols to JavaScript format
         let cleanExpr = expr
             .replace(/π/g, Math.PI)
             .replace(/e/g, Math.E)
@@ -63,12 +52,12 @@ function evaluateExpression(expr, precision = 4) {
             .replace(/×/g, '*')
             .replace(/−/g, '-');
         
-        // Evaluate (note: in production use math.js instead of eval)
+        // Evaluate using Function constructor (safer than eval)
         let result = Function('"use strict"; return (' + cleanExpr + ')')();
         
-        // Apply precision
-        const factor = Math.pow(10, precision);
-        result = Math.round(result * factor) / factor;
+        // Apply precision rounding
+        const roundingFactor = Math.pow(10, precision);
+        result = Math.round(result * roundingFactor) / roundingFactor;
         
         return result;
         

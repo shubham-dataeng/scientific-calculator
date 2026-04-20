@@ -30,7 +30,7 @@ Comprehensive automated test framework:
 - **Arithmetic:** 500+ tests for basic operations
 - **Scientific:** 400+ tests for functions
 - **Edge Cases:** 600+ tests for boundary conditions
-- **Operator Precedence:** 700+ tests for PEMDAS/BODMAS
+- **Operator Precedence:** 700+ tests for BODMAS (Brackets, Orders, Division/Multiplication, Addition/Subtraction)
 - **Precision:** 300+ tests for decimal accuracy
 
 ---

@@ -1,3 +1,4 @@
+<!-- Scientific Calculator App -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,11 +40,11 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dy='.3em'>🧮</text></svg>">
     
+    <!-- CRITICAL MATH LIBRARY - Load synchronously before script.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    
     <!-- PRELOAD CRITICAL RESOURCES -->
     <link rel="preload" as="script" href="script.js">
-    
-    <!-- PREFETCH OPTIONAL RESOURCES -->
-    <link rel="prefetch" href="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js">
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 </head>
 <body>
@@ -55,7 +56,6 @@
     </noscript>
     
     <div class="container" id="app-container">
-        <!-- Calculator -->
         <div class="calculator">
             <div class="mode-toggle">
                 <button class="toggle-btn" id="modeToggle">Show Scientific</button>
@@ -336,6 +336,7 @@
             <label for="equationInput">Enter equation (e.g., 2x + 5 = 13):</label>
             <input type="text" id="equationInput" class="solver-equation-input" placeholder="2x + 5 = 13">
             <button class="solver-btn" id="solveBtn">Solve</button>
+            <button class="solver-btn clear-btn" id="solverClearBtn">Clear</button>
         </div>
 
         <div class="solver-results" id="solverResults" style="display: none;">
@@ -440,49 +441,11 @@
         <button class="setting-btn reset-btn" id="resetSettings">Reset to Defaults</button>
     </div>
 
-    <!-- MAIN SCRIPT - Async for non-blocking -->
-    <script async src="script.js"></script>
+    <!-- MAIN SCRIPT - Deferred to ensure DOM is ready and math.js is loaded -->
+    <script defer src="script.js"></script>
     
     <!-- PERFORMANCE MONITORING -->
     <script defer src="performance-monitor.js"></script>
-    
-    <!-- LAZY LOAD MATHJS - Deferred, not critical for initial render -->
-    <script>
-        // Lazy load math.js on first calculation
-        let mathLoaded = false;
-        let mathLoadQueue = [];
-        
-        function loadMathJS() {
-            if (mathLoaded) return;
-            mathLoaded = true;
-            
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js';
-            script.async = false;
-            script.onload = () => {
-                console.log('✅ math.js loaded');
-                // Process any queued calculations
-                mathLoadQueue.forEach(fn => fn());
-                mathLoadQueue = [];
-            };
-            document.head.appendChild(script);
-        }
-        
-        // Intercept calculator's calculate method
-        window.addEventListener('load', () => {
-            if (typeof calc !== 'undefined') {
-                const originalCalculate = calc.calculate.bind(calc);
-                calc.calculate = function() {
-                    if (!mathLoaded) {
-                        loadMathJS();
-                        mathLoadQueue.push(() => originalCalculate());
-                    } else {
-                        originalCalculate();
-                    }
-                };
-            }
-        });
-    </script>
     
     <!-- SERVICE WORKER REGISTRATION -->
     <script>

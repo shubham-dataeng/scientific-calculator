@@ -8,7 +8,7 @@ A high-performance scientific calculator built with vanilla JavaScript. Handles 
 
 ## What It Does
 
-Calculate anything from basic arithmetic to scientific functions without leaving your browser. The calculator parses expressions like a real calculator would, respects operator precedence (PEMDAS/BODMAS), and handles the floating-point precision issues that trip up naive implementations.
+Calculate anything from basic arithmetic to scientific functions without leaving your browser. The calculator parses expressions like a real calculator would, respects operator precedence (BODMAS), and handles the floating-point precision issues that trip up naive implementations.
 
 ---
 

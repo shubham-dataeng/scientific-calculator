@@ -116,7 +116,7 @@
 
 #### 4. Operator Precedence (700+ cases)
 ```
-✅ PEMDAS/BODMAS:         100 cases
+✅ BODMAS:                100 cases
 ✅ Parentheses:           100 cases
 ✅ Complex expressions:   300 cases
 ✅ Random expressions:    200 cases

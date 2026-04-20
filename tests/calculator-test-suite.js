@@ -1,3 +1,8 @@
+// Comprehensive test suite for the scientific calculator
+// Tests 100,000+ cases covering arithmetic, BODMAS compliance, scientific functions, and edge cases
+
+
+
 /**
  * SCIENTIFIC CALCULATOR - COMPREHENSIVE AUTOMATED TEST SUITE
  * 100,000+ Test Cases | Full QA Automation
