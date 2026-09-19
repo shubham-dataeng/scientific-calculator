@@ -554,3 +554,11 @@ if (typeof window !== 'undefined') {
     window.CalculatorTestSuite = CalculatorTestSuite;
     console.log('✅ Test suite loaded! Run: const testSuite = new CalculatorTestSuite(); testSuite.runAllTests();');
 }
+
+if (typeof global !== 'undefined') {
+    global.CalculatorTestSuite = CalculatorTestSuite;
+}
+
+export default CalculatorTestSuite;
+export { CalculatorTestSuite };
+

@@ -1,463 +1,512 @@
-<!-- Scientific Calculator App -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#667eea">
-    <meta name="description" content="Advanced Scientific Calculator with Unit Converter, Programmer Mode, Statistics, and more">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Antigravity Math Studio - Advanced Scientific Calculator, Dynamic Workspace, 2D Graphing, Equation Solver, Programmer Mode, and Data Analysis.">
+    <title>Antigravity Math Studio — Scientific Computing</title>
     
-    <!-- PERFORMANCE OPTIMIZATION - Cache Control -->
-    <meta http-equiv="Cache-Control" content="public, max-age=31536000, immutable">
-    
-    <title>Advanced Scientific Calculator</title>
-    
-    <!-- CRITICAL CSS - Inline for faster initial render -->
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .container { max-width: 1200px; width: 100%; }
-        .spinner { 
-            width: 50px; height: 50px; 
-            border: 4px solid #fff; border-top-color: #667eea;
-            border-radius: 50%; animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
-    
-    <!-- NON-CRITICAL CSS - Deferred loading -->
-    <link rel="stylesheet" href="style.css" media="print" onload="this.media='all'">
-    
-    <!-- CRITICAL RESOURCES -->
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dy='.3em'>🧮</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230f172a' width='192' height='192' rx='36'/><text x='50%' y='55%' font-size='110' fill='%2338bdf8' text-anchor='middle' dominant-baseline='central'>🧮</text></svg>">
     
-    <!-- CRITICAL MATH LIBRARY - Load synchronously before script.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
-    
-    <!-- PRELOAD CRITICAL RESOURCES -->
-    <link rel="preload" as="script" href="script.js">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <!-- Design System & Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- LOADING INDICATOR -->
-    <noscript>
-        <p style="color: white; text-align: center; font-size: 18px; padding: 20px;">
-            JavaScript is required to use this calculator. Please enable it in your browser settings.
-        </p>
-    </noscript>
-    
-    <div class="container" id="app-container">
-        <div class="calculator">
-            <div class="mode-toggle">
-                <button class="toggle-btn" id="modeToggle">Show Scientific</button>
-                <button class="toggle-btn theme-toggle" id="themeToggle">🌙 Dark</button>
-                <button class="toggle-btn" id="helpBtn" title="Keyboard Shortcuts">? Help</button>
-                <button class="toggle-btn" id="notationToggle" title="Scientific Notation">Notation</button>
-                <button class="toggle-btn" id="converterToggle" title="Unit Converter">🔄 Converter</button>
-                <button class="toggle-btn" id="programmerToggle" title="Programmer Mode">💻 Prog</button>
-                <button class="toggle-btn" id="statsToggle" title="Statistics">📊 Stats</button>
-                <button class="toggle-btn" id="constantsToggle" title="Constants Library">⚗️ Const</button>
-                <button class="toggle-btn" id="solverToggle" title="Equation Solver">🔢 Solver</button>
-                <button class="toggle-btn" id="settingsBtn" title="Settings">⚙️</button>
-                <select id="precisionSelect" class="precision-select" title="Decimal Places">
-                    <option value="2">2 decimals</option>
-                    <option value="4" selected>4 decimals</option>
-                    <option value="6">6 decimals</option>
-                    <option value="8">8 decimals</option>
-                    <option value="10">10 decimals</option>
-                    <option value="15">15 decimals</option>
-                </select>
-            </div>
-
-            <div class="display-section">
-                <div class="formula" id="formula">0</div>
-                <div class="result" id="result">0</div>
-            </div>
-
-            <div class="angle-mode" id="angleModeContainer" style="display: none;">
-                <button class="angle-btn active" data-mode="deg">DEG</button>
-                <button class="angle-btn" data-mode="rad">RAD</button>
-            </div>
-
-            <!-- Basic Operations -->
-            <div class="btn-container">
-                <button class="clear" id="clear">C</button>
-                <button class="delete" id="delete">⌫</button>
-                <button class="operator" data-op="/">÷</button>
-                <button class="operator" data-op="*">×</button>
-            </div>
-
-            <div class="btn-container">
-                <button data-num="7">7</button>
-                <button data-num="8">8</button>
-                <button data-num="9">9</button>
-                <button class="operator" data-op="-">−</button>
-            </div>
-
-            <div class="btn-container">
-                <button data-num="4">4</button>
-                <button data-num="5">5</button>
-                <button data-num="6">6</button>
-                <button class="operator" data-op="+">+</button>
-            </div>
-
-            <div class="btn-container">
-                <button data-num="1">1</button>
-                <button data-num="2">2</button>
-                <button data-num="3">3</button>
-                <button class="operator" data-op=".">.</button>
-            </div>
-
-            <div class="btn-container">
-                <button data-num="0" style="grid-column: span 2;">0</button>
-                <button class="operator" data-op="(" style="font-size: 14px;">(</button>
-                <button class="operator" data-op=")" style="font-size: 14px;">)</button>
-            </div>
-
-            <div class="btn-container" style="grid-template-columns: repeat(2, 1fr);">
-                <button class="equals" id="equals">=</button>
-                <button class="operator" data-op="^">^</button>
-            </div>
-
-            <!-- Advanced Operations -->
-            <div class="advanced-section" id="advancedSection">
-                <div class="btn-container full">
-                    <button class="operator" data-func="sin">sin</button>
-                    <button class="operator" data-func="cos">cos</button>
-                    <button class="operator" data-func="tan">tan</button>
-                    <button class="operator" data-func="sqrt">√</button>
-                    <button class="operator" data-func="pi">π</button>
-                </div>
-
-                <div class="btn-container full">
-                    <button class="operator" data-func="asin">sin⁻¹</button>
-                    <button class="operator" data-func="acos">cos⁻¹</button>
-                    <button class="operator" data-func="atan">tan⁻¹</button>
-                    <button class="operator" data-func="log">log</button>
-                    <button class="operator" data-func="ln">ln</button>
-                </div>
-
-                <div class="btn-container full">
-                    <button class="operator" data-func="sinh">sinh</button>
-                    <button class="operator" data-func="cosh">cosh</button>
-                    <button class="operator" data-func="tanh">tanh</button>
-                    <button class="operator" data-func="exp">e^x</button>
-                    <button class="operator" data-op="e">e</button>
-                </div>
-
-                <div class="btn-container full">
-                    <button class="operator" data-func="fact">n!</button>
-                    <button class="operator" data-func="abs">|x|</button>
-                    <button class="operator" data-func="percent">%</button>
-                    <button class="operator" data-func="cbrt">∛</button>
-                    <button style="opacity: 0; cursor: default;"></button>
-                </div>
-
-                <div class="memory-controls">
-                    <button class="memory-btn" id="memAdd">M+</button>
-                    <button class="memory-btn" id="memSub">M-</button>
-                    <button class="memory-btn" id="memRecall">MR</button>
-                    <button class="memory-btn" id="memClear">MC</button>
+    <div class="app-layout">
+        <!-- TOP HEADER BAR -->
+        <header class="app-header" role="banner">
+            <div class="header-brand">
+                <div class="brand-logo">🧮</div>
+                <div class="brand-info">
+                    <h1 class="brand-title">Antigravity Math Studio</h1>
+                    <span class="brand-badge">PRO v2.0</span>
                 </div>
             </div>
-        </div>
 
-        <!-- History -->
-        <div class="history-section">
-            <h3>
-                Calculation History
-                <span id="memDisplay" style="font-size: 12px; color: #667eea; display: none;">M: <span id="memValue">0</span></span>
-            </h3>
-            <div class="history-list" id="historyList">
-                <div class="empty-history">No calculations yet</div>
+            <!-- Global Instrument Controls -->
+            <div class="header-controls">
+                <!-- Angle Mode Selector -->
+                <div class="angle-mode-selector" role="radiogroup" aria-label="Angle Measurement Mode">
+                    <button class="angle-pill active" data-mode="deg" role="radio" aria-checked="true" title="Degrees">DEG</button>
+                    <button class="angle-pill" data-mode="rad" role="radio" aria-checked="false" title="Radians">RAD</button>
+                    <button class="angle-pill" data-mode="grad" role="radio" aria-checked="false" title="Gradians">GRAD</button>
+                </div>
+
+                <!-- Precision Dropdown -->
+                <div class="control-group">
+                    <label for="precisionSelect" class="visually-hidden">Decimal Precision</label>
+                    <select id="precisionSelect" class="precision-dropdown" title="Display Decimal Precision">
+                        <option value="2">2 Decimals</option>
+                        <option value="4" selected>4 Decimals</option>
+                        <option value="6">6 Decimals</option>
+                        <option value="8">8 Decimals</option>
+                        <option value="10">10 Decimals</option>
+                        <option value="15">15 Decimals</option>
+                    </select>
+                </div>
+
+                <!-- Theme Toggle -->
+                <button class="header-icon-btn" id="themeToggleBtn" title="Toggle Theme (Dark / Light)" aria-label="Toggle Theme">
+                    🌙 <span class="nav-text">Dark</span>
+                </button>
+
+                <!-- Help / Shortcuts -->
+                <button class="header-icon-btn" id="helpBtn" title="Keyboard Shortcuts (Ctrl+H)" aria-label="Keyboard Shortcuts">
+                    ⌨️ <span class="nav-text">Help</span>
+                </button>
             </div>
-            <button class="clear-history" id="clearHistory">Clear History</button>
+        </header>
+
+        <!-- PRIMARY MODE NAVIGATION TABS -->
+        <nav class="mode-navigation" role="navigation" aria-label="Application Modes">
+            <button class="nav-tab active" data-mode="calculator">
+                <span class="nav-icon">🧮</span> Calculator
+            </button>
+            <button class="nav-tab" data-mode="workspace">
+                <span class="nav-icon">📝</span> Workspace
+            </button>
+            <button class="nav-tab" data-mode="graphing">
+                <span class="nav-icon">📈</span> Graphing
+            </button>
+            <button class="nav-tab" data-mode="solver">
+                <span class="nav-icon">🔢</span> Equations
+            </button>
+            <button class="nav-tab" data-mode="programmer">
+                <span class="nav-icon">💻</span> Programmer
+            </button>
+            <button class="nav-tab" data-mode="matrix">
+                <span class="nav-icon">▦</span> Matrix
+            </button>
+            <button class="nav-tab" data-mode="stats">
+                <span class="nav-icon">📊</span> Statistics
+            </button>
+            <button class="nav-tab" data-mode="converter">
+                <span class="nav-icon">🔄</span> Converter
+            </button>
+        </nav>
+
+        <!-- MAIN APP CONTENT AREA -->
+        <div class="studio-workspace">
+            <!-- PRIMARY INSTRUMENT PANE -->
+            <main class="primary-instrument" role="main">
+                
+                <!-- 1. CALCULATOR PANE -->
+                <section class="mode-pane active" id="pane_calculator" aria-label="Scientific Calculator">
+                    <div class="calculator-card">
+                        <!-- DISPLAY SCREEN -->
+                        <div class="calc-display-section" role="region" aria-label="Calculator Display">
+                            <div class="display-top-bar">
+                                <span class="syntax-badge" id="syntaxBadge">Ready</span>
+                                <span class="live-preview" id="livePreview" aria-live="polite"></span>
+                            </div>
+
+                            <div class="formula-container">
+                                <input type="text" id="formulaInput" class="formula-input" placeholder="Type expression (e.g. 2 + 3 * 4, sin(30), 10 km to miles)" spellcheck="false" autocomplete="off" aria-label="Expression Formula">
+                            </div>
+
+                            <div class="result-container">
+                                <div class="result-value" id="resultDisplay" title="Click to copy result" aria-live="polite">0</div>
+                            </div>
+
+                            <!-- Smart Result Multi-Format Drawer -->
+                            <div class="result-drawer" id="resultDrawer" aria-label="Result Formats"></div>
+
+                            <!-- Explainable Steps Toggle Bar -->
+                            <button class="explainer-toggle-btn" id="toggleExplainerBtn" aria-expanded="false" aria-controls="explainerDrawer">
+                                <span>💡 How was this calculated?</span>
+                                <span class="toggle-arrow">▾</span>
+                            </button>
+
+                            <!-- Explainer Drawer -->
+                            <div class="explainer-drawer" id="explainerDrawer">
+                                <div class="explainer-content" id="explainerSteps">
+                                    <div class="empty-state">Perform a calculation to see step-by-step reductions.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SCIENTIFIC KEYPAD -->
+                        <div class="calc-keypad" role="toolbar" aria-label="Calculator Keypad">
+                            <!-- Functional Row 1 -->
+                            <button class="key-btn key-shift" id="btnShift" title="Toggle Secondary Functions">2nd</button>
+                            <button class="key-btn key-op" data-insert="(">(</button>
+                            <button class="key-btn key-op" data-insert=")">)</button>
+                            <button class="key-btn key-op" data-insert="%">%</button>
+                            <button class="key-btn key-clear" id="btnClear" title="Clear Expression (Esc)">C</button>
+                            <button class="key-btn key-delete" id="btnDelete" title="Backspace (⌫)">⌫</button>
+                            <button class="key-btn key-operator" data-insert=" / " title="Divide (÷)">÷</button>
+
+                            <!-- Functional Row 2 -->
+                            <button class="key-btn key-fn" data-shift-func="sin" data-base-label="sin" data-shift-label="sin⁻¹" data-insert="sin(">sin</button>
+                            <button class="key-btn key-fn" data-shift-func="cos" data-base-label="cos" data-shift-label="cos⁻¹" data-insert="cos(">cos</button>
+                            <button class="key-btn key-fn" data-shift-func="tan" data-base-label="tan" data-shift-label="tan⁻¹" data-insert="tan(">tan</button>
+                            <button class="key-btn key-const" data-insert="π">π</button>
+                            <button class="key-btn key-num" data-insert="7">7</button>
+                            <button class="key-btn key-num" data-insert="8">8</button>
+                            <button class="key-btn key-num" data-insert="9">9</button>
+                            <button class="key-btn key-operator" data-insert=" * " title="Multiply (×)">×</button>
+
+                            <!-- Functional Row 3 -->
+                            <button class="key-btn key-fn" data-shift-func="ln" data-base-label="ln" data-shift-label="eˣ" data-insert="ln(">ln</button>
+                            <button class="key-btn key-fn" data-shift-func="log" data-base-label="log" data-shift-label="10ˣ" data-insert="log(">log</button>
+                            <button class="key-btn key-fn" data-shift-func="sqrt" data-base-label="√" data-shift-label="∛" data-insert="sqrt(">√</button>
+                            <button class="key-btn key-const" data-insert="e">e</button>
+                            <button class="key-btn key-num" data-insert="4">4</button>
+                            <button class="key-btn key-num" data-insert="5">5</button>
+                            <button class="key-btn key-num" data-insert="6">6</button>
+                            <button class="key-btn key-operator" data-insert=" - " title="Subtract (−)">−</button>
+
+                            <!-- Functional Row 4 -->
+                            <button class="key-btn key-fn" data-insert="sinh(">sinh</button>
+                            <button class="key-btn key-fn" data-insert="cosh(">cosh</button>
+                            <button class="key-btn key-fn" data-insert="tanh(">tanh</button>
+                            <button class="key-btn key-op" data-insert="^" title="Power (xʸ)">^</button>
+                            <button class="key-btn key-num" data-insert="1">1</button>
+                            <button class="key-btn key-num" data-insert="2">2</button>
+                            <button class="key-btn key-num" data-insert="3">3</button>
+                            <button class="key-btn key-operator" data-insert=" + " title="Add (+)">+</button>
+
+                            <!-- Functional Row 5 -->
+                            <button class="key-btn key-fn" data-insert="!" title="Factorial (n!)">n!</button>
+                            <button class="key-btn key-fn" data-insert="abs(">|x|</button>
+                            <button class="key-btn key-fn" data-insert="^(2)">x²</button>
+                            <button class="key-btn key-const" data-insert="phi">φ</button>
+                            <button class="key-btn key-num key-zero" data-insert="0">0</button>
+                            <button class="key-btn key-num" data-insert=".">.</button>
+                            <button class="key-btn key-equals" id="btnEquals" title="Calculate Result (Enter)">=</button>
+                        </div>
+
+                        <!-- Memory Control Bar -->
+                        <div class="memory-bar" role="toolbar" aria-label="Memory Controls">
+                            <button class="mem-pill" id="btnMemAdd" title="Add current value to memory">M+</button>
+                            <button class="mem-pill" id="btnMemSub" title="Subtract current value from memory">M−</button>
+                            <button class="mem-pill" id="btnMemRecall" title="Recall value from memory">MR</button>
+                            <button class="mem-pill" id="btnMemClear" title="Clear memory">MC</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. DYNAMIC WORKSPACE PANE -->
+                <section class="mode-pane" id="pane_workspace" aria-label="Calculation Workspace">
+                    <div class="workspace-card">
+                        <div class="pane-header">
+                            <div>
+                                <h2>📝 Calculation Worksheet</h2>
+                                <p class="pane-subtitle">Multi-line reactive calculation sheet. Define variables, reference previous lines (<code>L1</code>, <code>L2</code>), and edit values with instant cascading recalculations.</p>
+                            </div>
+                            <div class="workspace-actions">
+                                <button class="action-btn primary" id="workspaceAddLineBtn">+ Add Line</button>
+                                <button class="action-btn" id="workspaceExportBtn" title="Export as Markdown">Export MD</button>
+                                <button class="action-btn danger" id="workspaceClearBtn">Clear</button>
+                            </div>
+                        </div>
+
+                        <div class="workspace-table" id="workspaceLinesContainer">
+                            <!-- Dynamic rows rendered by workspace.js -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. GRAPHING STUDIO PANE -->
+                <section class="mode-pane" id="pane_graphing" aria-label="2D Graphing Studio">
+                    <div class="graphing-card">
+                        <div class="pane-header">
+                            <div>
+                                <h2>📈 2D Function Plotter</h2>
+                                <p class="pane-subtitle">Plot multiple Cartesian functions. Drag to pan, scroll wheel to zoom, and hover to inspect exact curve coordinates.</p>
+                            </div>
+                            <div class="graph-toolbar">
+                                <button class="action-btn" id="graphZoomInBtn">Zoom In (+)</button>
+                                <button class="action-btn" id="graphZoomOutBtn">Zoom Out (−)</button>
+                                <button class="action-btn" id="graphResetBtn">Reset View</button>
+                            </div>
+                        </div>
+
+                        <div class="graph-inputs-row">
+                            <div class="graph-func-input">
+                                <span class="func-legend legend-f1"></span>
+                                <label for="graphF1">f₁(x) =</label>
+                                <input type="text" id="graphF1" value="sin(x)" placeholder="e.g. sin(x), x^2 - 4, cos(2x)">
+                            </div>
+                            <div class="graph-func-input">
+                                <span class="func-legend legend-f2"></span>
+                                <label for="graphF2">f₂(x) =</label>
+                                <input type="text" id="graphF2" value="x^2 - 4" placeholder="Optional 2nd curve (e.g. 2x + 1)">
+                            </div>
+                        </div>
+
+                        <div class="canvas-wrapper">
+                            <canvas id="graphCanvas"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. EQUATION SOLVER PANE -->
+                <section class="mode-pane" id="pane_solver" aria-label="Equation Solver">
+                    <div class="solver-card">
+                        <div class="pane-header">
+                            <div>
+                                <h2>🔢 Equation Solver & Derivation</h2>
+                                <p class="pane-subtitle">Solves linear equations, quadratic equations with discriminant analysis, and non-linear equations with complete step-by-step algebra.</p>
+                            </div>
+                        </div>
+
+                        <div class="solver-input-bar">
+                            <input type="text" id="equationInputStr" class="solver-input" placeholder="e.g. 2x + 5 = 15, x^2 - 5x + 6 = 0, or 3(x - 2) = x + 4">
+                            <button class="action-btn primary" id="equationSolveBtn">Solve Equation</button>
+                        </div>
+
+                        <div class="solver-output-container" id="equationOutput">
+                            <div class="empty-state">Enter an equation above and click "Solve Equation" to view exact solutions and derivation steps.</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. PROGRAMMER MODE PANE -->
+                <section class="mode-pane" id="pane_programmer" aria-label="Programmer Mode">
+                    <div class="programmer-card">
+                        <div class="pane-header">
+                            <div>
+                                <h2>💻 64-Bit Programmer Calculator</h2>
+                                <p class="pane-subtitle">Interactive bit register, simultaneous hexadecimal, decimal, octal, and binary inspection with word size masking.</p>
+                            </div>
+                            <div class="prog-settings">
+                                <select id="progWordSelect" class="precision-dropdown">
+                                    <option value="64" selected>QWORD (64-bit)</option>
+                                    <option value="32">DWORD (32-bit)</option>
+                                    <option value="16">WORD (16-bit)</option>
+                                    <option value="8">BYTE (8-bit)</option>
+                                </select>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="progSignToggle"> Signed (Two's Compl.)
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Radix Display Cards -->
+                        <div class="radix-grid">
+                            <div class="radix-card"><span class="radix-label">HEX</span><span class="radix-val" id="progHexDisplay">0</span></div>
+                            <div class="radix-card"><span class="radix-label">DEC</span><span class="radix-val" id="progDecDisplay">0</span></div>
+                            <div class="radix-card"><span class="radix-label">OCT</span><span class="radix-val" id="progOctDisplay">0</span></div>
+                            <div class="radix-card"><span class="radix-label">BIN</span><span class="radix-val" id="progBinDisplay">0000 0000</span></div>
+                        </div>
+
+                        <!-- Interactive 64-bit Bitboard -->
+                        <div class="bitboard-section">
+                            <h4>Interactive Bit Register (Click any bit to toggle):</h4>
+                            <div class="bitboard-grid" id="programmerBitBoard">
+                                <!-- Dynamic bit buttons -->
+                            </div>
+                        </div>
+
+                        <!-- Bitwise Operations Toolbar -->
+                        <div class="bitwise-toolbar">
+                            <button class="bit-op-btn" data-prog-op="AND">AND</button>
+                            <button class="bit-op-btn" data-prog-op="OR">OR</button>
+                            <button class="bit-op-btn" data-prog-op="XOR">XOR</button>
+                            <button class="bit-op-btn" data-prog-op="NOT">NOT (~)</button>
+                            <button class="bit-op-btn" data-prog-op="NAND">NAND</button>
+                            <button class="bit-op-btn" data-prog-op="NOR">NOR</button>
+                            <button class="bit-op-btn" data-prog-op="LSH">LSH (&lt;&lt;)</button>
+                            <button class="bit-op-btn" data-prog-op="RSH">RSH (&gt;&gt;)</button>
+                            <button class="bit-op-btn" data-prog-op="ROTL">ROTL</button>
+                            <button class="bit-op-btn" data-prog-op="ROTR">ROTR</button>
+                            <button class="bit-op-btn danger" data-prog-op="CLEAR">Clear (0)</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. MATRIX STUDIO PANE -->
+                <section class="mode-pane" id="pane_matrix" aria-label="Matrix Studio">
+                    <div class="matrix-card">
+                        <div class="pane-header">
+                            <div>
+                                <h2>▦ Matrix Algebra Studio</h2>
+                                <p class="pane-subtitle">Linear algebra computations: determinant, inversion, transpose, trace, and matrix multiplications.</p>
+                            </div>
+                        </div>
+
+                        <div class="matrix-input-grid">
+                            <div class="matrix-box">
+                                <label for="matrixAInput">Matrix A (rows separated by semicolons):</label>
+                                <textarea id="matrixAInput" class="matrix-textarea" rows="3" placeholder="1 2; 3 4">1 2; 3 4</textarea>
+                            </div>
+                            <div class="matrix-box">
+                                <label for="matrixBInput">Matrix B (for binary operations):</label>
+                                <textarea id="matrixBInput" class="matrix-textarea" rows="3" placeholder="5 6; 7 8">5 6; 7 8</textarea>
+                            </div>
+                        </div>
+
+                        <div class="matrix-actions-bar">
+                            <select id="matrixOpSelect" class="precision-dropdown">
+                                <option value="det">Determinant det(A)</option>
+                                <option value="inv">Inverse A⁻¹</option>
+                                <option value="trans">Transpose Aᵀ</option>
+                                <option value="trace">Trace tr(A)</option>
+                                <option value="mult">Multiply A × B</option>
+                                <option value="add">Add A + B</option>
+                                <option value="sub">Subtract A − B</option>
+                            </select>
+                            <button class="action-btn primary" id="matrixComputeBtn">Execute Matrix Operation</button>
+                        </div>
+
+                        <div class="matrix-output-box" id="matrixOutput">
+                            <div class="empty-state">Select an operation and click Execute.</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. STATISTICS PANE -->
+                <section class="mode-pane" id="pane_stats" aria-label="Statistics Studio">
+                    <div class="stats-card">
+                        <div class="pane-header">
+                            <div>
+                                <h2>📊 Descriptive Statistics & Data Analysis</h2>
+                                <p class="pane-subtitle">Paste or type sample datasets to compute distribution metrics, quartiles, variance, and frequency histograms.</p>
+                            </div>
+                        </div>
+
+                        <div class="stats-input-section">
+                            <label for="statsDatasetInput">Dataset (enter numbers separated by commas, spaces, or lines):</label>
+                            <textarea id="statsDatasetInput" class="stats-textarea" rows="2" placeholder="12, 15, 18, 20, 25, 30, 32">12, 15, 18, 20, 25, 30, 32</textarea>
+                            <button class="action-btn primary" id="statsComputeBtn">Analyze Dataset</button>
+                        </div>
+
+                        <div class="stats-output-container" id="statsOutput">
+                            <!-- Populated by stats.js -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. UNIT CONVERTER PANE -->
+                <section class="mode-pane" id="pane_converter" aria-label="Unit Converter">
+                    <div class="converter-card">
+                        <div class="pane-header">
+                            <div>
+                                <h2>🔄 Precision Unit Converter</h2>
+                                <p class="pane-subtitle">12 engineering categories. You can also type natural queries in the calculator bar like: <code>10 km to miles</code> or <code>25 C to F</code>.</p>
+                            </div>
+                        </div>
+
+                        <div class="converter-controls-box">
+                            <div class="converter-cat-row">
+                                <label for="convCategorySelect">Category:</label>
+                                <select id="convCategorySelect" class="precision-dropdown">
+                                    <option value="length">Length</option>
+                                    <option value="mass">Mass & Weight</option>
+                                    <option value="temperature">Temperature</option>
+                                    <option value="area">Area</option>
+                                    <option value="volume">Volume</option>
+                                    <option value="speed">Speed</option>
+                                    <option value="time">Time</option>
+                                    <option value="pressure">Pressure</option>
+                                    <option value="energy">Energy</option>
+                                    <option value="power">Power</option>
+                                    <option value="data">Digital Data</option>
+                                    <option value="angle">Angle</option>
+                                </select>
+                            </div>
+
+                            <div class="converter-exchange-row">
+                                <div class="converter-side">
+                                    <label for="convFromInput">From:</label>
+                                    <input type="number" id="convFromInput" class="conv-val-input" value="10" placeholder="Value">
+                                    <select id="convFromUnitSelect" class="precision-dropdown"></select>
+                                </div>
+
+                                <button class="conv-swap-btn" id="convSwapBtn" title="Swap Units">⇄</button>
+
+                                <div class="converter-side">
+                                    <label for="convToInput">To:</label>
+                                    <input type="text" id="convToInput" class="conv-val-input" readonly placeholder="Result">
+                                    <select id="convToUnitSelect" class="precision-dropdown"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- SECONDARY SIDE PANEL (History & Variables Bank) -->
+            <aside class="side-inspector" role="complementary" aria-label="History and Variable Bank">
+                <div class="side-tabs-header">
+                    <button class="side-tab active" data-pane="sideHistoryPane">⏱ History</button>
+                    <button class="side-tab" data-pane="sideMemoryPane">⚗ Variables & Memory</button>
+                </div>
+
+                <!-- History Pane -->
+                <div class="side-pane active" id="sideHistoryPane">
+                    <div class="history-controls-row">
+                        <input type="text" id="historySearchInput" class="history-search" placeholder="Search calculations..." aria-label="Search calculation history">
+                        <div class="history-btn-group">
+                            <button class="side-icon-btn" id="exportHistoryBtn" title="Export History (.txt)">⤓</button>
+                            <button class="side-icon-btn danger" id="clearHistoryBtn" title="Clear All History">🗑</button>
+                        </div>
+                    </div>
+                    <div class="history-scroll-list" id="historyList">
+                        <!-- Populated by history.js -->
+                    </div>
+                </div>
+
+                <!-- Memory & Variable Bank Pane -->
+                <div class="side-pane" id="sideMemoryPane">
+                    <div class="memory-bank-info">
+                        <p>Click any variable or constant to insert into expression.</p>
+                    </div>
+                    <div class="memory-bank-grid" id="memoryBankContainer">
+                        <!-- Populated by ui.js -->
+                    </div>
+                </div>
+            </aside>
         </div>
     </div>
 
-    <!-- Unit Converter -->
-    <div id="converterSection" class="converter-section" style="display: none;">
-        <h3>🔄 Unit Converter</h3>
-        
-        <div class="converter-group">
-            <label>Category:</label>
-            <select id="converterCategory" class="converter-select">
-                <option value="length">Length</option>
-                <option value="weight">Weight</option>
-                <option value="temperature">Temperature</option>
-                <option value="volume">Volume</option>
-            </select>
-        </div>
-
-        <div class="converter-input-group">
-            <div class="converter-item">
-                <label>From:</label>
-                <input type="number" id="converterFrom" placeholder="Enter value" class="converter-input">
-                <select id="converterFromUnit" class="converter-select"></select>
+    <!-- KEYBOARD SHORTCUTS MODAL -->
+    <div class="modal-overlay" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalTitle">⌨️ Keyboard Shortcuts & Usage Guide</h3>
+                <button class="modal-close-btn" id="closeHelpModal" aria-label="Close modal">&times;</button>
             </div>
-            
-            <button class="swap-btn" id="swapUnits">⇄</button>
-            
-            <div class="converter-item">
-                <label>To:</label>
-                <input type="number" id="converterTo" placeholder="Result" class="converter-input" readonly>
-                <select id="converterToUnit" class="converter-select"></select>
-            </div>
-        </div>
-    </div>
-
-    <!-- Programmer Mode -->
-    <div id="programmerSection" class="programmer-section" style="display: none;">
-        <h3>💻 Programmer Mode</h3>
-        
-        <div class="base-converter">
-            <div class="base-item">
-                <label>Decimal:</label>
-                <input type="number" id="progDecimal" class="prog-input">
-            </div>
-            
-            <div class="base-item">
-                <label>Binary:</label>
-                <input type="text" id="progBinary" class="prog-input" placeholder="0b...">
-            </div>
-
-            <div class="base-item">
-                <label>Hexadecimal:</label>
-                <input type="text" id="progHex" class="prog-input" placeholder="0x...">
-            </div>
-
-            <div class="base-item">
-                <label>Octal:</label>
-                <input type="text" id="progOctal" class="prog-input" placeholder="0o...">
-            </div>
-        </div>
-
-        <h4>Bitwise Operations</h4>
-        <div class="bitwise-controls">
-            <div class="bit-input-group">
-                <input type="number" id="bitNum1" class="bit-input" placeholder="Number 1">
-                <select id="bitwiseOp" class="bit-select">
-                    <option value="and">AND (&)</option>
-                    <option value="or">OR (|)</option>
-                    <option value="xor">XOR (^)</option>
-                    <option value="not">NOT (~)</option>
-                    <option value="lshift">Left Shift (<<)</option>
-                    <option value="rshift">Right Shift (>>)</option>
-                </select>
-                <input type="number" id="bitNum2" class="bit-input" placeholder="Number 2">
-            </div>
-            <button class="bit-calc-btn" id="bitwiseCalc">Calculate</button>
-            <div class="bit-result" id="bitResult">Result will appear here</div>
-        </div>
-    </div>
-
-    <!-- Statistics Calculator -->
-    <div id="statsSection" class="stats-section" style="display: none;">
-        <h3>📊 Statistics Calculator</h3>
-        
-        <div class="stats-input-group">
-            <input type="number" id="statsInput" class="stats-number-input" placeholder="Enter a number">
-            <button class="stats-add-btn" id="statsAddBtn">Add</button>
-            <button class="stats-clear-btn" id="statsClearBtn">Clear All</button>
-        </div>
-
-        <div class="stats-list-container">
-            <h4>Numbers:</h4>
-            <div class="stats-list" id="statsList">No numbers yet</div>
-        </div>
-
-        <div class="stats-results">
-            <h4>Results:</h4>
-            <div class="stats-result-item">
-                <label>Count:</label>
-                <span id="statsCount">0</span>
-            </div>
-            <div class="stats-result-item">
-                <label>Sum:</label>
-                <span id="statsSum">0</span>
-            </div>
-            <div class="stats-result-item">
-                <label>Mean (Average):</label>
-                <span id="statsMean">0</span>
-            </div>
-            <div class="stats-result-item">
-                <label>Median:</label>
-                <span id="statsMedian">0</span>
-            </div>
-            <div class="stats-result-item">
-                <label>Mode:</label>
-                <span id="statsMode">N/A</span>
-            </div>
-            <div class="stats-result-item">
-                <label>Variance:</label>
-                <span id="statsVariance">0</span>
-            </div>
-            <div class="stats-result-item">
-                <label>Std Dev:</label>
-                <span id="statsStdDev">0</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Constants Library -->
-    <div id="constantsSection" class="constants-section" style="display: none;">
-        <h3>⚗️ Constants Library</h3>
-        
-        <div class="constants-category">
-            <h4>Physics</h4>
-            <div class="constants-grid" id="physicsConstants"></div>
-        </div>
-
-        <div class="constants-category">
-            <h4>Mathematics</h4>
-            <div class="constants-grid" id="mathConstants"></div>
-        </div>
-
-        <div class="constants-category">
-            <h4>Chemistry</h4>
-            <div class="constants-grid" id="chemistryConstants"></div>
-        </div>
-    </div>
-
-    <!-- Equation Solver -->
-    <div id="solverSection" class="solver-section" style="display: none;">
-        <h3>🔢 Equation Solver</h3>
-        
-        <div class="solver-input-group">
-            <label for="equationInput">Enter equation (e.g., 2x + 5 = 13):</label>
-            <input type="text" id="equationInput" class="solver-equation-input" placeholder="2x + 5 = 13">
-            <button class="solver-btn" id="solveBtn">Solve</button>
-            <button class="solver-btn clear-btn" id="solverClearBtn">Clear</button>
-        </div>
-
-        <div class="solver-results" id="solverResults" style="display: none;">
-            <h4>Solution:</h4>
-            <div class="solver-solution" id="solverSolution"></div>
-            <div class="solver-steps" id="solverSteps"></div>
-        </div>
-
-        <div class="solver-error" id="solverError" style="display: none;"></div>
-
-        <div class="solver-info">
-            <h4>Supported Formats:</h4>
-            <ul>
-                <li><strong>Linear:</strong> 2x + 5 = 13 or ax + b = 0</li>
-                <li><strong>Quadratic:</strong> x² + 3x + 2 = 0 or x^2 + 3x + 2 = 0</li>
-                <li><strong>Use x or X as variable</strong></li>
-                <li><strong>Use ^ for power (x^2, x^3, etc.)</strong></li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Help Modal -->
-    <div id="helpModal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeHelp">&times;</span>
-            <h2>⌨️ Keyboard Shortcuts</h2>
-            <div class="shortcuts-grid">
-                <div class="shortcut">
-                    <kbd>0-9</kbd> <span>Type numbers</span>
+            <div class="modal-body">
+                <div class="shortcut-list">
+                    <div class="sc-item"><kbd>0-9</kbd><span>Digits</span></div>
+                    <div class="sc-item"><kbd>+</kbd> <kbd>-</kbd> <kbd>*</kbd> <kbd>/</kbd><span>Arithmetic operations</span></div>
+                    <div class="sc-item"><kbd>^</kbd><span>Power (exponentiation)</span></div>
+                    <div class="sc-item"><kbd>(</kbd> <kbd>)</kbd><span>Parentheses grouping</span></div>
+                    <div class="sc-item"><kbd>Enter</kbd><span>Calculate result</span></div>
+                    <div class="sc-item"><kbd>Backspace</kbd><span>Delete previous character</span></div>
+                    <div class="sc-item"><kbd>Escape</kbd><span>Clear all</span></div>
+                    <div class="sc-item"><kbd>Ctrl</kbd> + <kbd>C</kbd><span>Copy calculation result</span></div>
+                    <div class="sc-item"><kbd>Ctrl</kbd> + <kbd>H</kbd><span>Toggle this shortcut guide</span></div>
                 </div>
-                <div class="shortcut">
-                    <kbd>+</kbd> <kbd>-</kbd> <kbd>*</kbd> <kbd>/</kbd> <span>Operations</span>
-                </div>
-                <div class="shortcut">
-                    <kbd>.</kbd> <span>Decimal point</span>
-                </div>
-                <div class="shortcut">
-                    <kbd>(</kbd> <kbd>)</kbd> <span>Parentheses</span>
-                </div>
-                <div class="shortcut">
-                    <kbd>Enter</kbd> <span>Calculate result</span>
-                </div>
-                <div class="shortcut">
-                    <kbd>Backspace</kbd> <span>Delete last digit</span>
-                </div>
-                <div class="shortcut">
-                    <kbd>Escape</kbd> <span>Clear all</span>
-                </div>
-                <div class="shortcut">
-                    <kbd>Ctrl</kbd> + <kbd>H</kbd> <span>Show this help</span>
-                </div>
-                <div class="shortcut">
-                    <kbd>Ctrl</kbd> + <kbd>C</kbd> <span>Copy result</span>
+                <div class="modal-examples">
+                    <h4>Smart Natural Expressions:</h4>
+                    <ul>
+                        <li><code>2 + 3 * 4</code> &rarr; Respects BODMAS / PEMDAS</li>
+                        <li><code>2π</code>, <code>3(4 + 5)</code>, <code>5sin(30)</code> &rarr; Implicit multiplication</li>
+                        <li><code>10 km to miles</code>, <code>25 C to F</code> &rarr; Natural unit conversion</li>
+                        <li><code>x = 25</code>, then <code>x * 4</code> &rarr; User-defined variables</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Settings Panel -->
-    <div id="settingsPanel" class="settings-panel">
-        <button class="close-settings" id="closeSettings">&times;</button>
-        <h3>⚙️ Settings</h3>
-        
-        <div class="settings-group">
-            <label>Angle Mode:</label>
-            <select id="settingAngleMode" class="setting-select">
-                <option value="deg">Degrees (°)</option>
-                <option value="rad">Radians (rad)</option>
-            </select>
-        </div>
-
-        <div class="settings-group">
-            <label>Decimal Precision:</label>
-            <select id="settingPrecision" class="setting-select">
-                <option value="2">2 decimals</option>
-                <option value="4">4 decimals</option>
-                <option value="6">6 decimals</option>
-                <option value="8">8 decimals</option>
-                <option value="10">10 decimals</option>
-                <option value="15">15 decimals</option>
-            </select>
-        </div>
-
-        <div class="settings-group">
-            <label>Theme:</label>
-            <div class="setting-options">
-                <button class="setting-btn" id="settingLight">☀️ Light</button>
-                <button class="setting-btn" id="settingDark">🌙 Dark</button>
-            </div>
-        </div>
-
-        <div class="settings-group">
-            <label>Notation Display:</label>
-            <div class="setting-toggle">
-                <label>
-                    <input type="checkbox" id="settingNotation">
-                    Scientific Notation
-                </label>
-            </div>
-        </div>
-
-        <button class="setting-btn reset-btn" id="resetSettings">Reset to Defaults</button>
-    </div>
-
-    <!-- MAIN SCRIPT - Deferred to ensure DOM is ready and math.js is loaded -->
-    <script defer src="script.js"></script>
-    
-    <!-- PERFORMANCE MONITORING -->
-    <script defer src="performance-monitor.js"></script>
-    
-    <!-- SERVICE WORKER REGISTRATION -->
+    <!-- SCRIPTS -->
+    <script type="module" src="app.js"></script>
     <script>
+        // Service worker registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js')
-                    .then(reg => {
-                        console.log('✅ Service Worker registered');
-                        // Check for updates periodically
-                        setInterval(() => reg.update(), 60000);
-                    })
-                    .catch(err => console.log('⚠️ Service Worker failed:', err.message));
+                    .then(() => console.log('✅ Offline PWA active.'))
+                    .catch(e => console.warn('PWA service worker skipped:', e));
             });
         }
     </script>

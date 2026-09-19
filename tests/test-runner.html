@@ -3,301 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scientific Calculator - QA Test Runner</title>
+    <title>Antigravity Math Studio — Automated Test Runner</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #0b0f19;
+            --surface: #111827;
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #f8fafc;
+            --text-sec: #94a3b8;
+            --pass: #34d399;
+            --fail: #fb7185;
+            --cyan: #38bdf8;
         }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 24px;
         }
-        
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
         }
-        
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-        
-        .content {
-            padding: 40px;
-        }
-        
-        .button-group {
+        header {
             display: flex;
-            gap: 15px;
-            margin-bottom: 40px;
-        }
-        
-        button {
-            flex: 1;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-        
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-        }
-        
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-        
-        .output {
-            background: #1e1e1e;
-            color: #00ff00;
-            padding: 20px;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            max-height: 600px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        
-        .log-entry {
-            margin-bottom: 10px;
-        }
-        
-        .error {
-            color: #ff4444;
-        }
-        
-        .success {
-            color: #44ff44;
-        }
-        
-        .warning {
-            color: #ffaa00;
-        }
-        
-        .info {
-            color: #44aaff;
-        }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .stat-card {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .stat-card h3 {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-        
-        .stat-card .value {
-            font-size: 32px;
-            font-weight: bold;
-            color: #667eea;
-        }
-        
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .running {
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #e3f2fd;
-            border-radius: 10px;
-            color: #1976d2;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
         }
+        h1 { font-size: 22px; margin: 0; }
+        .btn-run {
+            background: var(--cyan);
+            color: #0b0f19;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .metrics-card {
+            display: flex;
+            gap: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .metric-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .metric-val {
+            font-size: 28px;
+            font-weight: 700;
+            font-family: monospace;
+        }
+        .metric-val.passed { color: var(--pass); }
+        .metric-val.failed { color: var(--fail); }
+        .test-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .test-row {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .test-row.pass { border-left: 4px solid var(--pass); }
+        .test-row.fail { border-left: 4px solid var(--fail); }
+        .status-tag {
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .status-tag.pass { background: rgba(52, 211, 153, 0.2); color: var(--pass); }
+        .status-tag.fail { background: rgba(251, 113, 133, 0.2); color: var(--fail); }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🧪 Scientific Calculator QA Test Suite</h1>
-            <p>Comprehensive Automated Testing System</p>
+        <header>
+            <div>
+                <h1>🧪 Antigravity Math Studio Test Suite</h1>
+                <p style="color: var(--text-sec); margin-top: 4px; font-size: 13px;">Full unit & regression test suite execution in the browser</p>
+            </div>
+            <button class="btn-run" id="btnRerun">Re-run Tests</button>
+        </header>
+
+        <div class="metrics-card">
+            <div class="metric-item">
+                <span style="color: var(--text-sec); font-size: 12px; text-transform: uppercase;">Passed</span>
+                <span class="metric-val passed" id="passedCount">0</span>
+            </div>
+            <div class="metric-item">
+                <span style="color: var(--text-sec); font-size: 12px; text-transform: uppercase;">Failed</span>
+                <span class="metric-val failed" id="failedCount">0</span>
+            </div>
+            <div class="metric-item">
+                <span style="color: var(--text-sec); font-size: 12px; text-transform: uppercase;">Total</span>
+                <span class="metric-val" id="totalCount">0</span>
+            </div>
         </div>
-        
-        <div class="content">
-            <div class="button-group">
-                <button class="btn-primary" onclick="runTests()">▶️ Run All Tests</button>
-                <button class="btn-secondary" onclick="clearOutput()">🗑️ Clear Output</button>
-                <button class="btn-secondary" onclick="downloadResults()">💾 Download Results</button>
-            </div>
-            
-            <div id="running" class="running" style="display: none;">
-                <div class="spinner"></div>
-                <span>Running tests... This may take 30-60 seconds</span>
-            </div>
-            
-            <div id="stats" class="stats"></div>
-            
-            <h2 style="margin-top: 30px; margin-bottom: 15px;">📋 Test Output:</h2>
-            <div id="output" class="output">Ready to run tests...</div>
+
+        <div class="test-list" id="testList">
+            <div style="text-align: center; color: var(--text-sec); padding: 40px;">Running tests...</div>
         </div>
     </div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
-    <script src="../script.js"></script>
-    <script src="calculator-test-suite.js"></script>
-    
-    <script>
-        const outputDiv = document.getElementById('output');
-        const statsDiv = document.getElementById('stats');
-        const runningDiv = document.getElementById('running');
-        
-        // Override console.log for output display
-        const originalLog = console.log;
-        console.log = function(...args) {
-            originalLog.apply(console, args);
-            const message = args.map(arg => {
-                if (typeof arg === 'object') return JSON.stringify(arg, null, 2);
-                return String(arg);
-            }).join(' ');
-            addLog(message);
-        };
-        
-        function addLog(message) {
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            entry.textContent = message;
-            outputDiv.appendChild(entry);
-            outputDiv.scrollTop = outputDiv.scrollHeight;
-        }
-        
-        function clearOutput() {
-            outputDiv.innerHTML = 'Cleared. Click "Run All Tests" to start.\n';
-            statsDiv.innerHTML = '';
-        }
-        
-        async function runTests() {
-            clearOutput();
-            runningDiv.style.display = 'flex';
-            
-            // Load calculator from the main page
-            try {
-                // Try to access calculator from parent window or create mock
-                if (typeof calc === 'undefined') {
-                    console.error('❌ Calculator not found. Please run tests from the calculator page.');
-                    runningDiv.style.display = 'none';
-                    return;
-                }
-                
-                const testSuite = new CalculatorTestSuite();
-                await new Promise(resolve => {
-                    testSuite.runAllTests();
-                    resolve();
-                });
-                
-                // Display stats
-                displayStats(window.testResults);
-                
-            } catch (error) {
-                console.error('❌ Error running tests:', error.message);
+
+    <script type="module">
+        import { Evaluator } from '../engine/evaluator.js';
+        import { MathFormat } from '../engine/fractions.js';
+        import { Explainer } from '../engine/explainer.js';
+        import { EquationSolver } from '../engine/solver.js';
+        import { MatrixEngine } from '../engine/matrix.js';
+        import { StatisticsEngine } from '../engine/stats.js';
+        import { ProgrammerEngine } from '../modules/programmer.js';
+        import { UnitEngine } from '../engine/units.js';
+
+        function runBrowserTests() {
+            const list = document.getElementById('testList');
+            list.innerHTML = '';
+            let passed = 0, failed = 0;
+
+            function assert(cond, name, details = '') {
+                const row = document.createElement('div');
+                row.className = `test-row ${cond ? 'pass' : 'fail'}`;
+                row.innerHTML = `
+                    <span>${name} ${details ? '<span style="color:var(--text-sec);">(' + details + ')</span>' : ''}</span>
+                    <span class="status-tag ${cond ? 'pass' : 'fail'}">${cond ? 'PASS' : 'FAIL'}</span>
+                `;
+                list.appendChild(row);
+                if (cond) passed++; else failed++;
             }
-            
-            runningDiv.style.display = 'none';
+
+            const ev = new Evaluator();
+            assert(ev.evaluate('2 + 3 * 4').value === 14, '2 + 3 * 4 = 14');
+            assert(ev.evaluate('0.1 + 0.2').value === 0.3, '0.1 + 0.2 = 0.3 (precision normalization)');
+            assert(ev.evaluate('(2 + 3)^4').value === 625, '(2 + 3)^4 = 625');
+            assert(ev.evaluate('5!').value === 120, '5! = 120');
+
+            const evDeg = new Evaluator({ angleMode: 'deg' });
+            assert(evDeg.evaluate('sin(30)').value === 0.5, 'sin(30°) = 0.5');
+            assert(evDeg.evaluate('asin(0.5)').value === 30, 'asin(0.5) = 30°');
+            assert(evDeg.evaluate('2π').value > 6.28, 'Implicit multiplication 2π');
+
+            const frac = MathFormat.toFraction(0.75);
+            assert(frac && frac.string === '3/4', '0.75 converts to 3/4');
+
+            const solver = new EquationSolver();
+            const lin = solver.solve('2x + 5 = 15');
+            assert(lin.solutions[0] === '5', 'Solves 2x + 5 = 15 -> x = 5');
+
+            const quad = solver.solve('x^2 - 5x + 6 = 0');
+            assert(quad.numericSolutions.includes(3) && quad.numericSolutions.includes(2), 'x^2 - 5x + 6 = 0 roots 3 and 2');
+
+            const det = MatrixEngine.determinant([[1, 2], [3, 4]]);
+            assert(det === -2, 'Matrix det([[1,2],[3,4]]) = -2');
+
+            const s = StatisticsEngine.analyze([12, 15, 18, 20, 25]);
+            assert(s.mean === 18 && s.median === 18, 'Statistics mean and median = 18');
+
+            const prog = new ProgrammerEngine();
+            prog.setValue(42);
+            assert(prog.getHex() === '000000000000002A', 'Programmer HEX representation of 42');
+
+            const nlp = UnitEngine.parseNaturalLanguage('10 km to miles');
+            assert(nlp && Math.abs(nlp.result - 6.2137) < 0.01, 'Unit NLP "10 km to miles"');
+
+            document.getElementById('passedCount').textContent = passed;
+            document.getElementById('failedCount').textContent = failed;
+            document.getElementById('totalCount').textContent = passed + failed;
         }
-        
-        function displayStats(results) {
-            if (!results) return;
-            
-            statsDiv.innerHTML = `
-                <div class="stat-card">
-                    <h3>Total Tests</h3>
-                    <div class="value">${results.total}</div>
-                </div>
-                <div class="stat-card" style="border-left-color: #44aa44;">
-                    <h3>Passed</h3>
-                    <div class="value" style="color: #44aa44;">${results.passed}</div>
-                </div>
-                <div class="stat-card" style="border-left-color: #ff4444;">
-                    <h3>Failed</h3>
-                    <div class="value" style="color: #ff4444;">${results.failed}</div>
-                </div>
-                <div class="stat-card" style="border-left-color: #ffaa00;">
-                    <h3>Pass Rate</h3>
-                    <div class="value" style="color: #ffaa00;">${results.passRate}</div>
-                </div>
-            `;
-        }
-        
-        function downloadResults() {
-            if (!window.testResults) {
-                alert('No test results to download. Run tests first!');
-                return;
-            }
-            
-            const dataStr = JSON.stringify(window.testResults, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `calculator-test-results-${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-        }
+
+        document.getElementById('btnRerun').addEventListener('click', runBrowserTests);
+        runBrowserTests();
     </script>
 </body>
 </html>

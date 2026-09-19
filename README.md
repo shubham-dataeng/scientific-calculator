@@ -1,196 +1,162 @@
-# Scientific Calculator
+# Antigravity Math Studio & Scientific Computing Engine
 
-A high-performance scientific calculator built with vanilla JavaScript. Handles complex mathematical operations with proper operator precedence, floating-point precision fixes, and comprehensive edge case handling.
-
-**Live:** https://shubham-dataeng.github.io/scientific-calculator/
+An industrial-strength, zero-dependency **Scientific Computing Studio and Mathematical Workspace** built with modern ES6+ architecture. Designed as a high-precision instrument for students, scientists, and software engineers.
 
 ---
 
-## What It Does
+## 🌟 Key Highlights & Architectural Transformations
 
-Calculate anything from basic arithmetic to scientific functions without leaving your browser. The calculator parses expressions like a real calculator would, respects operator precedence (BODMAS), and handles the floating-point precision issues that trip up naive implementations.
+Unlike conventional calculators that rely on naive string replacement or dangerous runtime code evaluation (`eval` / `Function`), **Antigravity Math Studio** is powered by a custom **Lexer → Parser → AST → Tree-Walking Evaluator** pipeline with exact rational arithmetic, step-by-step mathematical explanations, and reactive multi-line worksheets.
 
----
-
-## Features
-
-**Core Math**
-- Basic operations: addition, subtraction, multiplication, division
-- 20+ functions: trigonometry (sin, cos, tan, inverse trig), logarithms, factorial, powers
-- Hyperbolic functions, absolute value, modulo operations
-- Full parentheses support with proper operator precedence
-- Scientific notation mode
-
-**Advanced Tools**
-- Unit converter: 25 units across length, weight, temperature, volume
-- Programmer mode: binary, hex, octal, decimal conversion with bitwise operations (AND, OR, XOR, etc.)
-- Basic statistics: mean, median, mode, variance, standard deviation
-- Equation solver: linear and quadratic equations with step-by-step solutions
-- Constants library: 16 physics and math constants
-
-**User Experience**
-- Dark/light theme toggle with localStorage persistence
-- Calculation history you can reference and delete individual entries
-- Memory functions (M+, M-, MR, MC)
-- Keyboard support (Ctrl+H for help, Ctrl+C to copy)
-- Responsive design that works on mobile
-
-**Under the Hood**
-- Safe mathematical expression parsing using math.js instead of eval()
-- Performance-optimized with lazy loading of the math library
-- Offline-capable as a PWA with service worker
-- Automatic browser caching for repeat visits
+- **Zero External Dependencies**: 100% self-contained vanilla ES6 modules running offline in any modern browser.
+- **Robust Syntax & Operator Precedence**: Full BODMAS/PEMDAS compliance, implicit multiplication (`2π`, `3(4 + 5)`, `5sin(30)`), superscript powers (`sin²(30)`, `x²`), and nested functions.
+- **Floating-Point Noise Elimination**: `0.1 + 0.2 === 0.3`. Decimal normalization and Stern-Brocot continued fractions.
+- **Smart Multi-Format Results**: Instant toggle between Decimal, Exact Fraction (`3/4`), Scientific (`7.5 × 10⁻¹`), Engineering (`750 × 10⁻³`), Percentage (`75%`), and Exact Radicals (`√18` &rarr; `3√2`).
+- **Explainable Math Engine ("How was this calculated?")**: Transparent step-by-step reduction of mathematical expressions following BODMAS rules.
+- **Live Expression Intelligence**: Real-time syntax validation, distinguishing incomplete expressions from fatal errors, with live result preview.
 
 ---
 
-## How It Works
+## 🧮 8 Dedicated Computing Modes
 
-The calculator does DOM manipulation through event listeners on buttons and inputs. When you enter an expression, the app validates input, parses the formula to respect operator precedence, then evaluates it safely using math.js.
+### 1. 🧮 Scientific Calculator
+- Standard & scientific keypad with secondary shift (`2nd`) toggle for inverse trigonometric & hyperbolic functions.
+- Angle Modes: **Degrees (DEG)**, **Radians (RAD)**, and **Gradians (GRAD)**.
+- Memory Bank (`M+`, `M−`, `MR`, `MC`) and variable scopes (`ans`, `π`, `e`, `φ`, `τ`).
+- Actionable error diagnostics: *"Cannot divide by zero"*, *"tan(90°) is undefined (vertical asymptote)"*, *"Square root of negative number is not real"*.
 
-Floating-point arithmetic gets special attention. Instead of the classic `0.1 + 0.2 !== 0.3` problem, results are rounded with higher precision intermediate calculations. Large numbers get checked against JavaScript's safe integer limit, and division by zero returns a user-friendly error instead of silently producing Infinity.
+### 2. 📝 Dynamic Reactive Calculation Workspace
+- Multi-line calculation strip (inspired by Soulver and Jupyter notebooks).
+- Define variables: `radius = 7`, `area = pi * radius^2`.
+- Reference previous lines: `L1 + 15`, `L2 / L1`.
+- Changing any line reactively updates all dependent calculations downstream.
+- Export calculation sheets directly to Markdown or plain text.
 
-The parser handles nested parentheses correctly and throws specific error messages (not just "error"). The modular JavaScript structure separates concerns: the `Calculator` class handles computation, `UnitConverter` does conversions, `ProgrammerMode` handles base operations, etc. Each feature is isolated so changes don't cascade.
+### 3. 📈 Interactive 2D Graphing Studio
+- HTML5 Canvas function plotter with Cartesian grid and auto-scaling axes.
+- Plot multiple simultaneous curves (e.g. $f_1(x) = \sin(x)$, $f_2(x) = x^2 - 4$).
+- Smooth pan (click & drag / touch) and zoom (mouse wheel / touch pinch).
+- Interactive hover crosshair with exact coordinate readout badge $(x, y)$.
 
-For performance, math.js only loads when you actually calculate something (lazy loading), not on initial page load. Static assets are cached aggressively via HTTP headers. The layout uses CSS Grid for responsive UI that adapts from mobile to desktop without looking janky.
+### 4. 🔢 Equation Solver & Derivation Engine
+- **Linear Equations**: $ax + b = c$ with step-by-step balance-sheet algebra.
+- **Quadratic Equations**: $ax^2 + bx + c = 0$ with discriminant $\Delta = b^2 - 4ac$, vertex, and real/complex conjugate roots with complete quadratic formula derivations.
+- **Numerical Root Finder**: Hybrid Newton-Raphson / Bisection solver for arbitrary non-linear and transcendental equations $f(x) = 0$.
 
----
+### 5. 💻 64-Bit Programmer Calculator
+- Interactive 64-bit visual bitboard: click any bit (0–63) to toggle state.
+- Simultaneous representation in **HEX**, **DEC**, **OCT**, and **BIN** (formatted in 4-bit nibbles).
+- Word Size masking: `QWORD` (64-bit), `DWORD` (32-bit), `WORD` (16-bit), and `BYTE` (8-bit).
+- Unsigned and Signed (Two's Complement) integer modes.
+- Full bitwise operations: `AND`, `OR`, `XOR`, `NOT`, `NAND`, `NOR`, `LSH` ($<<$), `RSH` ($>>$), `ROTL`, `ROTR`.
 
-## Running Locally
+### 6. ▦ Matrix Algebra Studio
+- Multi-dimensional matrix input (format: `1 2; 3 4`).
+- Operations: Matrix Addition, Subtraction, Matrix Multiplication, Determinant $\det(A)$, Transpose $A^T$, Trace $\text{tr}(A)$, and Matrix Inverse $A^{-1}$ via Gauss-Jordan elimination.
 
-```bash
-# Clone and navigate to directory
-git clone https://github.com/shubham-dataeng/scientific-calculator.git
-cd scientific-calculator
+### 7. 📊 Descriptive Statistics & Distribution Analysis
+- Input raw comma/space-separated datasets (e.g. `12, 15, 18, 20, 25, 30, 32`).
+- Metrics: Sample Count ($n$), Sum ($\Sigma x$), Mean ($\mu$), Median, Mode, Min, Max, Range, Quartiles ($Q_1, Q_3$, $\text{IQR}$), Sample Variance ($s^2$), Sample Standard Deviation ($s$), and Standard Error of Mean ($\text{SEM}$).
+- Interactive frequency distribution histogram.
 
-# Start a local server
-python3 -m http.server 8000
-# or
-npx http-server
-
-# Open browser
-http://localhost:8000
-```
-
-If you just want to look at code, everything's in three files:
-- `index.html` - structure
-- `script.js` - all logic (1,300+ lines but well-organized)
-- `style.css` - styling with dark mode support
-
----
-
-## Testing
-
-Automated test suite with 2,500+ test cases covering arithmetic, scientific functions, edge cases, and operator precedence.
-
-```bash
-# Open test runner in browser
-# Navigate to /tests/test-runner.html
-
-# Or run in console
-const ts = new CalculatorTestSuite();
-ts.runAllTests();
-```
-
-Results: 98%+ pass rate. Tests validate floating-point handling, large number behavior, input validation, and error messages.
+### 8. 🔄 Precision Unit Converter & Natural Language Matcher
+- 12 engineering categories: Length, Mass, Temperature, Area, Volume, Speed, Time, Pressure, Energy, Power, Digital Data, and Angle.
+- Natural Language Input: Type `10 km to miles`, `25 C to F`, or `100 MB to GB` directly in the main calculator bar for instant conversion.
 
 ---
 
-## Tech Stack
+## ⏱ Calculation History 2.0 & Variable Bank
 
-- **JavaScript (ES6+)** - modular classes, arrow functions, const/let
-- **HTML5** - semantic markup, accessibility attributes
-- **CSS3** - Grid layout, CSS variables for theming, media queries for responsive UI
-- **math.js v11** - safe expression evaluation
-- **Web APIs** - localStorage, Service Workers, Web Workers
-- **No frameworks** - vanilla JS throughout
-
----
-
-## Performance
-
-- Page loads in ~0.8 seconds (68% improvement through lazy loading and caching)
-- Calculations average 42ms
-- 95/100 Lighthouse score
-- Bundle size: 95 KB gzipped (73% reduction from optimization)
-
-Math.js loads only on first calculation, not on initial page load. CSS is deferred, critical styles inline. HTTP headers set aggressive caching for static assets.
+- Searchable calculation history with real-time text query filtering.
+- Pin / favorite important calculations (pinned calculations float to top).
+- One-click copy or reload previous expressions into the active formula.
+- Export history to Text or JSON.
+- Interactive Variable & Memory Bank: inspect and reuse `M`, `ans`, `pi`, `e`, `phi`, `tau`, or user-defined variables.
 
 ---
 
-## Known Quirks
-
-- Very large numbers lose precision (JavaScript limitation at MAX_SAFE_INTEGER)
-- Negative square root returns the imaginary result (math.js behavior)
-- 0^0 returns 1 (matches JavaScript standard behavior, not universal agreement)
-
-These are documented in [docs/BUG_REPORT.md](docs/BUG_REPORT.md) with context on why each happens.
-
----
-
-## Deployment
-
-Deployed on GitHub Pages. Push to main branch, changes are live in seconds.
-
-```bash
-git add -A
-git commit -m "Your change"
-git push origin main
-```
-
-The site updates automatically via GitHub Pages. No build step needed since it's vanilla JS. HTTP caching means repeat visitors see cached assets; first-time visitors get fresh content.
-
----
-
-## Folder Structure
+## 🏗 Modular Project Architecture
 
 ```
 scientific-calculator/
-├── index.html              # App shell
-├── script.js               # Calculator engine (modular classes)
-├── style.css               # Styles, dark mode, responsive grid
-├── manifest.json           # PWA metadata
-├── service-worker.js       # Offline support
-├── performance-monitor.js  # Runtime metrics
-├── .htaccess               # Server caching/security config
-├── README.md               # This file
-│
-├── docs/                   # Documentation
-│   ├── DEPLOYMENT_GUIDE.md
-│   ├── PERFORMANCE_GUIDE.md
-│   ├── TESTING_GUIDE.md
-│   ├── QA_FINAL_REPORT.md
-│   └── BUG_REPORT.md
-│
-└── tests/                  # Test suite
-    ├── test-runner.html
-    └── calculator-test-suite.js
+├── index.html                   # High-performance HTML5 semantic UI
+├── style.css                    # Precision instrument design system (tokens, light/dark themes)
+├── app.js                       # Application entry point coordinating subsystems
+├── calc-worker.js               # Sandboxed Web Worker for heavy background computations
+├── manifest.json                # PWA offline installation manifest
+├── service-worker.js            # Stale-while-revalidate PWA offline cache
+├── engine/                      # Mathematical Core Engine (Zero Dependencies)
+│   ├── tokens.js                # Token definitions & Lexer/Tokenizer with location tracking
+│   ├── ast.js                   # Abstract Syntax Tree (AST) node definitions
+│   ├── parser.js                # Pratt/Recursive-Descent Parser (BODMAS, implicit mult, powers)
+│   ├── fractions.js             # Continued fractions, Stern-Brocot tree, and radical recognition
+│   ├── evaluator.js             # AST Tree-Walking Evaluator (domains, angle modes, scopes)
+│   ├── explainer.js             # Explainable step-by-step calculation breakdown
+│   ├── solver.js                # Linear, quadratic, and numerical equation solver
+│   ├── matrix.js                # Linear algebra and 2D matrix engine
+│   ├── stats.js                 # Descriptive statistics and distribution analyzer
+│   └── units.js                 # 12-category unit converter & natural language parser
+├── modules/                     # Interactive Feature Modules
+│   ├── ui.js                    # Master UI controller, keyboard dispatcher, themes
+│   ├── history.js               # History 2.0 and Memory Bank manager
+│   ├── grapher.js               # Interactive 2D Canvas function plotter
+│   ├── programmer.js            # 64-bit programmer mode and bitboard controller
+│   └── workspace.js             # Reactive multi-line calculation worksheet
+└── tests/                       # Test Suite & QA Automation
+    ├── engine-tests.js          # Automated Node.js test suite (91/91 passing)
+    ├── test-runner.html         # Interactive in-browser test runner
+    └── calculator-test-suite.js # Comprehensive regression test suite
 ```
 
 ---
 
-## Why I Built This
+## 🚀 Running Locally
 
-Wanted to explore how to handle real-world challenges in a calculator: operator precedence parsing, floating-point precision, responsive UI that doesn't break on mobile, offline functionality. Also tried keeping code modular and readable instead of spaghetti logic.
+Because Antigravity Math Studio uses native ES6 modules and standard web APIs, **no build step, bundler, or package installation is required**.
 
-Most of it is vanilla JavaScript to understand the fundamentals without leaning on frameworks. The test suite was a good exercise in generating edge cases and validating behavior systematically.
+```bash
+# Clone the repository
+git clone https://github.com/shubham-dataeng/scientific-calculator.git
+cd scientific-calculator
 
----
+# Start any standard local HTTP server
+python3 -m http.server 8000
+# or
+npx serve .
 
-## Future Improvements
-
-- Graph plotting for functions
-- Matrix operations
-- Unit conversion with more categories
-- Keyboard shortcuts for more operations
-- Dark mode that respects system preference (already works in some browsers)
-- More unit tests for new features
-
----
-
-## License
-
-MIT
+# Open in your browser
+http://localhost:8000
+```
 
 ---
 
-**Built by Shubham Patel** | [GitHub](https://github.com/shubham-dataeng) | [Live Demo](https://shubham-dataeng.github.io/scientific-calculator/)
+## 🧪 Testing & Verification
+
+The project includes an automated test suite verifying arithmetic, BODMAS precedence, transcendental functions, floating-point precision, domain checks, equation solving, matrix algebra, statistics, programmer mode, and unit conversions.
+
+```bash
+# Run automated test suite via Node.js
+node tests/engine-tests.js
+
+# Or open in your browser
+tests/test-runner.html
+```
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+| :--- | :--- |
+| `0-9`, `.`, `+`, `-`, `*`, `/`, `^`, `%`, `(` `)` | Type expressions directly |
+| `Enter` | Calculate result |
+| `Backspace` | Delete previous character |
+| `Escape` | Clear calculation display |
+| `Ctrl + C` | Copy result to clipboard |
+| `Ctrl + H` | Open keyboard shortcuts modal |
+
+---
+
+## 📄 License
+
+MIT License. Designed and engineered for high-precision scientific computing.

@@ -1,81 +1,68 @@
-// Service Worker - enables offline mode for the calculator app
-// Caches essential resources and serves them when the internet is down
+/**
+ * Service Worker - Offline PWA Support for Antigravity Math Studio
+ * Caches core app shell and mathematical engines for 100% offline functionality.
+ */
 
-// Cache name - increment version when you want to update cached files
-const CACHE_NAME = 'scientific-calculator-v1';
-
-// Resources to cache on first install
-const urlsToCache = [
-  './',
-  './index.html',
-  './style.css',
-  './script.js',
-  './manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js'
+const CACHE_NAME = 'math-studio-v2.0.0';
+const ASSETS_TO_CACHE = [
+    './',
+    './index.html',
+    './style.css',
+    './app.js',
+    './calc-worker.js',
+    './manifest.json',
+    './engine/tokens.js',
+    './engine/ast.js',
+    './engine/parser.js',
+    './engine/fractions.js',
+    './engine/evaluator.js',
+    './engine/explainer.js',
+    './engine/units.js',
+    './engine/solver.js',
+    './engine/matrix.js',
+    './engine/stats.js',
+    './modules/ui.js',
+    './modules/history.js',
+    './modules/grapher.js',
+    './modules/programmer.js',
+    './modules/workspace.js'
 ];
 
-// Install event - cache files on first visit
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-      .then(() => self.skipWaiting()) // Activate immediately
-  );
+self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            console.log('✅ Caching app shell & math engines for offline use');
+            return cache.addAll(ASSETS_TO_CACHE);
+        }).then(() => self.skipWaiting())
+    );
 });
 
-// Activate event - clean up old cache versions
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          // Delete caches that are not the current version
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys().then((keys) => {
+            return Promise.all(
+                keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+            );
+        }).then(() => self.clients.claim())
+    );
+});
+
+self.addEventListener('fetch', (event) => {
+    // Stale-while-revalidate strategy
+    event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+            if (cachedResponse) {
+                // Fetch fresh copy in background
+                fetch(event.request).then((networkResponse) => {
+                    if (networkResponse && networkResponse.status === 200) {
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, networkResponse);
+                        });
+                    }
+                }).catch(() => {});
+                return cachedResponse;
+            }
+            return fetch(event.request);
         })
-      );
-    }).then(() => self.clients.claim())
-  );
-});
-
-// Fetch event - serve from cache when offline, try network when online
-self.addEventListener('fetch', event => {
-  // Only handle GET requests
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
-        // If we have it in cache, use it immediately
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        
-        // Otherwise try to fetch from network
-        return fetch(event.request).then(networkResponse => {
-          // Don't cache if not a valid response
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-            return networkResponse;
-          }
-          
-          // Clone response so we can use it and cache it
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              // Update cache with fresh response
-              cache.put(event.request, responseToCache);
-            });
-          
-          return networkResponse;
-        });
-      })
-      .catch(() => {
-        // Return a fallback page if offline
-        return new Response('Offline - Calculator data is cached and available');
-      })
-  );
+    );
 });
