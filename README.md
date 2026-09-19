@@ -2,6 +2,14 @@
 
 An industrial-strength, zero-dependency **Scientific Computing Studio and Mathematical Workspace** built with modern ES6+ architecture. Designed as a high-precision instrument for students, scientists, and software engineers.
 
+<p align="center">
+  <a href="assets/scientific-calculator-demo.gif">
+    <img src="assets/scientific-calculator-demo.gif" alt="Antigravity Math Studio & Scientific Computing Engine — Interactive Demo" width="850px" />
+  </a>
+  <br>
+  <em>Live Demo: Lexer-Parser AST engine, exact rational arithmetic, reactive Soulver-style worksheets & 2D canvas grapher</em>
+</p>
+
 ---
 
 ## 🌟 Key Highlights & Architectural Transformations
